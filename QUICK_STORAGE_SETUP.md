@@ -54,3 +54,4 @@ USING (bucket_id = 'avatars');
 5. Перейдите в **Storage** → **Policies**
 6. Выберите bucket `avatars`
 7. Добавьте политики вручную (или они создадутся автоматически для публичного bucket)
+

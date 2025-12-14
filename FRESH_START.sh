@@ -29,3 +29,4 @@ echo "   git push -u origin main --force"
 echo ""
 echo "⚠️  Это перезапишет ветку main на GitHub!"
 echo "   Старая ветка сохранена локально как 'old-main-with-history'"
+

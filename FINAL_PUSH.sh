@@ -14,3 +14,4 @@ fi
 echo "✅ Секретов не найдено"
 echo "📤 Загружаем на GitHub..."
 git push -u origin main --force
+

@@ -37,3 +37,4 @@
 После того как вы настроите Pages и добавите secrets, закоммитьте изменения в коде - GitHub Actions автоматически задеплоит приложение.
 
 URL будет: https://sixxset5-star.github.io/crm-desktop/
+

@@ -95,3 +95,4 @@ node scripts/migrate-to-supabase.mjs
 
 ⚠️ **Не публикуйте ключи Supabase!**  
 `.env.local` уже в `.gitignore`, но убедитесь, что не коммитите ключи в код.
+

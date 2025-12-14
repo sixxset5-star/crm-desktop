@@ -49,7 +49,12 @@ CREATE TABLE IF NOT EXISTS contractors (
     avatar TEXT,
     comment TEXT,
     accesses JSONB, -- JSON array
-    active INTEGER DEFAULT 1
+    specialization TEXT,
+    rate REAL,
+    rating REAL,
+    is_active INTEGER DEFAULT 1,
+    created_at TEXT,
+    updated_at TEXT
 );
 
 -- Таблица целей
@@ -160,3 +165,4 @@ CREATE INDEX IF NOT EXISTS idx_tasks_customer_id ON tasks(customer_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_column_id ON tasks(column_id);
 CREATE INDEX IF NOT EXISTS idx_credit_schedule_credit_id ON credit_schedule_items(credit_id);
 CREATE INDEX IF NOT EXISTS idx_credit_schedule_payment_date ON credit_schedule_items(payment_date);
+

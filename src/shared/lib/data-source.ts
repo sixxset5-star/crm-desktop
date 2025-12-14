@@ -332,3 +332,4 @@ export async function deleteContractor(id: string): Promise<void> {
     await saveContractors(updated);
   }
 }
+

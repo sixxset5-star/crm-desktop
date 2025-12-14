@@ -198,14 +198,15 @@ export function Customers(): React.ReactElement {
 		<div className="page">
 			<div style={{ 
 				display: 'flex', 
-				justifyContent: 'space-between', 
-				alignItems: 'center' 
+				flexDirection: 'column',
+				gap: 'var(--space-md)',
+				marginBottom: 'var(--space-md)' 
 			}}>
 				<div>
 					<h1 className="page-title">Заказчики</h1>
 					<p className="page-subtitle">Управление клиентской базой</p>
 				</div>
-				<Button onClick={handleAddNew} variant="primary">
+				<Button onClick={handleAddNew} variant="primary" size="sm">
 					<span style={{ 
 						display: 'inline-flex', 
 						alignItems: 'center', 

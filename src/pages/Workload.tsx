@@ -355,8 +355,8 @@ export function Workload(): React.ReactElement {
 		<div className="page" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 			<div style={{ 
 				display: 'flex', 
-				justifyContent: 'space-between', 
-				alignItems: 'center', 
+				flexDirection: 'column',
+				gap: 'var(--space-md)',
 				marginBottom: `var(--space-lg)`, 
 				flexShrink: 0 
 			}}>
@@ -457,11 +457,12 @@ export function Workload(): React.ReactElement {
 					>
 						<ChevronLeftIcon size={iconSizeMd} color="currentColor" />
 					</Button>
-					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-xs)' }}>
+					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-xs)', minWidth: 'fit-content' }}>
 						<span style={{ 
 							fontWeight: 'var(--font-weight-semibold)',
 							fontSize: `var(--font-size-md)`,
 							color: 'var(--text)',
+							whiteSpace: 'nowrap',
 						}}>
 							{currentMonth.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })}
 						</span>

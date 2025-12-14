@@ -40,3 +40,4 @@
 - SQLite REAL → PostgreSQL REAL (совместимо)
 - SQLite TEXT → PostgreSQL TEXT (совместимо)
 - Все индексы созданы для оптимизации запросов
+

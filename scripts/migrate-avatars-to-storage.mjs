@@ -274,3 +274,4 @@ async function migrate() {
 
 // Запускаем миграцию
 migrate();
+

@@ -140,3 +140,4 @@ const { contractor_id, paused_from_column_id, ...taskCleaned } = task;
 - Предлагает выполнить миграцию
 
 Но пока достаточно ручных миграций через SQL Editor.
+

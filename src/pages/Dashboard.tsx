@@ -227,7 +227,7 @@ export function Dashboard(): React.ReactElement {
 
 	return (
 		<div className="page">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
             				<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
                                 <h1 className="page-title">Доска</h1>
             					<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', flexWrap: 'wrap' }}>
@@ -243,13 +243,13 @@ export function Dashboard(): React.ReactElement {
 								</div>
             				</div>
 				<div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap' }}>
-                            <Button onClick={handleAddTask} variant="primary">
+                            <Button onClick={handleAddTask} variant="primary" size="sm">
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
                                     <PlusIcon size={iconSizeSm} color="currentColor" />
                                     <span>Добавить задачу</span>
                                 </span>
                             </Button>
-					<Button onClick={handleAddIncome} variant="secondary">
+					<Button onClick={handleAddIncome} variant="secondary" size="sm">
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
                                     <PlusIcon size={iconSizeSm} color="currentColor" />
                                     <span>Добавить доход</span>

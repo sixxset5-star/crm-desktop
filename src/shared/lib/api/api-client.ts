@@ -198,7 +198,24 @@ export async function loadContractors(): Promise<Contractor[]> {
       return [];
     }
 
-    return data || [];
+    if (!data) return [];
+
+    // Преобразуем snake_case в camelCase и INTEGER в boolean
+    return data.map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      contact: row.contact || undefined,
+      contacts: row.contacts || undefined,
+      avatar: row.avatar || undefined,
+      comment: row.comment || undefined,
+      accesses: row.accesses || undefined,
+      specialization: row.specialization || undefined,
+      rate: row.rate ?? undefined,
+      rating: row.rating ?? undefined,
+      isActive: row.is_active !== undefined ? row.is_active === 1 : (row.active !== undefined ? row.active === 1 : true), // Поддержка старого поля active
+      createdAt: row.created_at || undefined,
+      updatedAt: row.updated_at || undefined,
+    }));
   } catch (error) {
     log.error('Error loading contractors', error);
     return [];
@@ -212,9 +229,26 @@ export async function saveContractors(contractors: Contractor[]): Promise<void> 
       return;
     }
 
+    // Преобразуем camelCase в snake_case и boolean в INTEGER
+    const dbContractors = contractors.map((contractor: any) => ({
+      id: contractor.id,
+      name: contractor.name,
+      contact: contractor.contact ?? null,
+      contacts: contractor.contacts ? (typeof contractor.contacts === 'string' ? contractor.contacts : JSON.stringify(contractor.contacts)) : null,
+      avatar: contractor.avatar ?? null,
+      comment: contractor.comment ?? null,
+      accesses: contractor.accesses ? (typeof contractor.accesses === 'string' ? contractor.accesses : JSON.stringify(contractor.accesses)) : null,
+      specialization: contractor.specialization ?? null,
+      rate: contractor.rate ?? null,
+      rating: contractor.rating ?? null,
+      is_active: contractor.isActive !== undefined ? (contractor.isActive === true ? 1 : 0) : 1, // Преобразуем boolean в INTEGER
+      created_at: contractor.createdAt ?? null,
+      updated_at: contractor.updatedAt ?? null,
+    }));
+
     const { error } = await supabase
       .from('contractors')
-      .upsert(contractors, { onConflict: 'id' });
+      .upsert(dbContractors, { onConflict: 'id' });
 
     if (error) {
       log.error('Failed to save contractors', error);
@@ -480,7 +514,8 @@ export async function loadSettings(): Promise<Settings | null> {
         excludedWeekendsCount: settings.excludedWeekends?.length || 0,
       });
     } catch (parseError) {
-      log.error('Failed to parse settings value', parseError, {
+      log.error('Failed to parse settings value', {
+        error: parseError,
         valueType: typeof data.value,
         valuePreview: typeof data.value === 'string' ? data.value.substring(0, 100) : String(data.value).substring(0, 100),
       });

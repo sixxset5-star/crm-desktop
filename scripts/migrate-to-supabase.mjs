@@ -139,16 +139,22 @@ async function migrateContractors() {
     return;
   }
 
-  // Исключаем колонки, которых нет в схеме Supabase и преобразуем is_active -> active
+  // Преобразуем данные для Supabase (snake_case формат)
   const contractorsToMigrate = contractors.map(contractor => {
-    // Удаляем колонки, которых нет в схеме Supabase
-    const { created_at, updated_at, is_active, specialization, rate, rating, ...contractorCleaned } = contractor;
     return {
-      ...contractorCleaned,
+      id: contractor.id,
+      name: contractor.name,
+      contact: contractor.contact || null,
       contacts: parseJSON(contractor.contacts),
+      avatar: contractor.avatar || null,
+      comment: contractor.comment || null,
       accesses: parseJSON(contractor.accesses),
-      // Преобразуем is_active (0/1) в active (0/1)
-      active: contractor.is_active ?? contractor.active ?? 1, // По умолчанию активен
+      specialization: contractor.specialization || null,
+      rate: contractor.rate ?? null,
+      rating: contractor.rating ?? null,
+      is_active: contractor.is_active ?? (contractor.active ?? 1), // Преобразуем в is_active
+      created_at: contractor.created_at || null,
+      updated_at: contractor.updated_at || null,
     };
   });
 
@@ -413,3 +419,4 @@ async function migrate() {
 
 // Запускаем миграцию
 migrate();
+

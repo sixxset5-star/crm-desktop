@@ -47,3 +47,4 @@ node scripts/migrate-avatars-to-storage.mjs
 - **Bucket не найден**: Убедитесь, что bucket `avatars` создан (см. SETUP_STORAGE.md)
 - **Файлы не найдены**: Проверьте путь к папке с аватарами
 - **Ошибки загрузки**: Проверьте ключи Supabase в переменных окружения
+

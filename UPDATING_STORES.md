@@ -75,3 +75,4 @@ import { loadTasks, saveTasks } from '@/shared/lib/data-source';
 ---
 
 Продолжаем обновлять stores? Это можно сделать автоматически.
+

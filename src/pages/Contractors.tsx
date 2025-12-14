@@ -269,14 +269,15 @@ export function Contractors(): React.ReactElement {
 		<div className="page">
 			<div style={{ 
 				display: 'flex', 
-				justifyContent: 'space-between', 
-				alignItems: 'center' 
+				flexDirection: 'column',
+				gap: 'var(--space-md)',
+				marginBottom: 'var(--space-md)' 
 			}}>
 				<div>
 					<h1 className="page-title">Подрядчики</h1>
 					<p className="page-subtitle">Управление исполнителями задач</p>
 				</div>
-				<Button onClick={handleAddNew} variant="primary">
+				<Button onClick={handleAddNew} variant="primary" size="sm">
 					<span style={{ 
 						display: 'inline-flex', 
 						alignItems: 'center', 

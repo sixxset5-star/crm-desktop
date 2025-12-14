@@ -35,3 +35,4 @@ else
   echo ""
   node scripts/migrate-to-supabase.mjs
 fi
+

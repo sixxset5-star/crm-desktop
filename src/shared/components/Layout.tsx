@@ -17,11 +17,12 @@ type LayoutProps = {
 
 export function Layout({ children }: LayoutProps): React.ReactElement {
 	const tasks = useShallowSelector(useBoardStore, (s) => s.tasks);
-	const loading = useBoardStore((s) => s.loading);
+	const loading = useBoardStore((s) => s.isLoading);
 	const settings = useShallowSelector(useSettingsStore, (s) => s.settings);
 	const navigate = useNavigate();
 	const [showGlobalSearch, setShowGlobalSearch] = useState(false);
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const updateTask = useBoardStore((s) => s.updateTask);
 	const notifiedTasksRef = useRef<Set<string>>(new Set());
 	const notifiedHolidaysRef = useRef<Set<string>>(new Set());
@@ -132,9 +133,65 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
 		navigate('/goals');
 	}
 	
+	const handleSidebarToggle = () => {
+		if (window.innerWidth <= 768) {
+			setMobileMenuOpen((prev) => !prev);
+		} else {
+			setSidebarCollapsed((prev) => !prev);
+		}
+	};
+
+	const handleMobileMenuClose = () => {
+		setMobileMenuOpen(false);
+	};
+
+	// Закрывать мобильное меню при изменении размера окна
+	useEffect(() => {
+		function handleResize() {
+			if (window.innerWidth > 768) {
+				setMobileMenuOpen(false);
+			}
+		}
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
+
+	// Закрывать мобильное меню при клике вне его
+	useEffect(() => {
+		if (!mobileMenuOpen) return;
+		function handleClickOutside(e: MouseEvent) {
+			const target = e.target as HTMLElement;
+			if (!target.closest('.sidebar') && !target.closest('.mobile-menu-button')) {
+				setMobileMenuOpen(false);
+			}
+		}
+		document.addEventListener('click', handleClickOutside);
+		return () => document.removeEventListener('click', handleClickOutside);
+	}, [mobileMenuOpen]);
+
 	return (
-		<div className={`app-root${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
-			<Sidebar onCollapse={() => setSidebarCollapsed((prev) => !prev)} collapsed={sidebarCollapsed} />
+		<div className={`app-root${sidebarCollapsed ? ' sidebar-collapsed' : ''}${mobileMenuOpen ? ' mobile-menu-open' : ''}`}>
+			{!mobileMenuOpen && (
+				<button
+					className="mobile-menu-button"
+					onClick={handleSidebarToggle}
+					aria-label="Открыть меню"
+					aria-expanded={mobileMenuOpen}
+				>
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+						<line x1="3" y1="12" x2="21" y2="12" />
+						<line x1="3" y1="6" x2="21" y2="6" />
+						<line x1="3" y1="18" x2="21" y2="18" />
+					</svg>
+				</button>
+			)}
+			{mobileMenuOpen && <div className="mobile-menu-overlay" onClick={handleMobileMenuClose} />}
+			<Sidebar 
+				onCollapse={handleSidebarToggle} 
+				collapsed={sidebarCollapsed} 
+				mobileOpen={mobileMenuOpen}
+				onMobileClose={handleMobileMenuClose}
+			/>
 			<main className="content">
 				{showGlobalSearch && (
 					<GlobalSearch

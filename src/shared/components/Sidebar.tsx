@@ -18,9 +18,11 @@ type SidebarProps = {
 	onCollapse?: () => void;
 	collapsed?: boolean;
 	logo?: React.ReactNode;
+	mobileOpen?: boolean;
+	onMobileClose?: () => void;
 };
 
-export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): React.ReactElement {
+export function Sidebar({ onCollapse, collapsed = false, logo, mobileOpen = false, onMobileClose }: SidebarProps): React.ReactElement {
 	const tasks = useShallowSelector(useBoardStore, (s) => s.tasks);
 	const customers = useShallowSelector(useCustomersStore, (s) => s.customers);
 	const settings = useShallowSelector(useSettingsStore, (s) => s.settings);
@@ -127,7 +129,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 	};
 	
 	return (
-		<aside className={`sidebar${collapsed ? ' collapsed' : ''}`}>
+		<aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' mobile-open' : ''}`}>
 			<div className="sidebar-content">
 				<div className="sidebar-header">
 					<div className="sidebar-brand">
@@ -144,22 +146,13 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 							type="button"
 							className="sidebar-toggle"
 							onClick={onCollapse}
-							title={collapsed ? 'Показать меню' : 'Скрыть меню'}
-							aria-label={collapsed ? 'Показать меню' : 'Скрыть меню'}
+							title="Закрыть меню"
+							aria-label="Закрыть меню"
 							aria-expanded={!collapsed}
 						>
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-								{collapsed ? (
-									<>
-										<line x1="5" y1="12" x2="19" y2="12" />
-										<polyline points="12 5 19 12 12 19" />
-									</>
-								) : (
-									<>
-										<line x1="18" y1="6" x2="6" y2="18" />
-										<line x1="6" y1="6" x2="18" y2="18" />
-									</>
-								)}
+								<line x1="18" y1="6" x2="6" y2="18" />
+								<line x1="6" y1="6" x2="18" y2="18" />
 							</svg>
 						</button>
 					)}
@@ -177,6 +170,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/" 
 						title={collapsed ? 'Доска' : undefined}
 						onMouseEnter={() => handlePreload('/')}
+						onClick={onMobileClose}
 					>
 						<BoardIcon size={18} />
 						<span className="nav-label">Доска</span>
@@ -186,6 +180,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/workload" 
 						title={collapsed ? 'Загруженность' : undefined}
 						onMouseEnter={() => handlePreload('/workload')}
+						onClick={onMobileClose}
 					>
 						<CalendarIcon size={18} />
 						<span className="nav-label">Загруженность</span>
@@ -195,6 +190,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/customers" 
 						title={collapsed ? 'Заказчики' : undefined}
 						onMouseEnter={() => handlePreload('/customers')}
+						onClick={onMobileClose}
 					>
 						<UsersIcon size={18} />
 						<span className="nav-label">Заказчики</span>
@@ -204,6 +200,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/contractors" 
 						title={collapsed ? 'Подрядчики' : undefined}
 						onMouseEnter={() => handlePreload('/contractors')}
+						onClick={onMobileClose}
 					>
 						<UsersIcon size={18} />
 						<span className="nav-label">Подрядчики</span>
@@ -215,6 +212,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/financial-model" 
 						title={collapsed ? 'Финансовая модель' : undefined}
 						onMouseEnter={() => handlePreload('/financial-model')}
+						onClick={onMobileClose}
 					>
 						<DollarIcon size={18} />
 						<span className="nav-label">Финансовая модель</span>
@@ -224,6 +222,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/calculator" 
 						title={collapsed ? 'Калькулятор' : undefined}
 						onMouseEnter={() => handlePreload('/calculator')}
+						onClick={onMobileClose}
 					>
 						<CalculatorIcon size={18} />
 						<span className="nav-label">Калькулятор</span>
@@ -233,6 +232,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/taxes" 
 						title={collapsed ? 'Налоги' : undefined}
 						onMouseEnter={() => handlePreload('/taxes')}
+						onClick={onMobileClose}
 					>
 						<TaxIcon size={18} />
 						<span className="nav-label">Налоги</span>
@@ -244,6 +244,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/reports" 
 						title={collapsed ? 'Отчёт по месяцам' : undefined}
 						onMouseEnter={() => handlePreload('/reports')}
+						onClick={onMobileClose}
 					>
 						<ChartIcon size={18} />
 						<span className="nav-label">Отчёт по месяцам</span>
@@ -253,6 +254,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/archive" 
 						title={collapsed ? 'Архив' : undefined}
 						onMouseEnter={() => handlePreload('/archive')}
+						onClick={onMobileClose}
 					>
 						<ArchiveIcon size={18} />
 						<span className="nav-label">Архив</span>
@@ -264,6 +266,7 @@ export function Sidebar({ onCollapse, collapsed = false, logo }: SidebarProps): 
 						to="/settings" 
 						title={collapsed ? 'Настройки' : undefined}
 						onMouseEnter={() => handlePreload('/settings')}
+						onClick={onMobileClose}
 					>
 						<SettingsIcon size={18} />
 						<span className="nav-label">Настройки</span>

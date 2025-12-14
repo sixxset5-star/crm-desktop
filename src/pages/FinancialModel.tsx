@@ -72,7 +72,7 @@ export function FinancialModel(): React.ReactElement {
 
 	return (
 		<div className="page">
-			<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
 				<div>
 					<h1 className="page-title">Финансовая модель</h1>
 					<p className="page-subtitle">Управление кредитами и финансовыми целями по месяцам</p>
@@ -83,6 +83,7 @@ export function FinancialModel(): React.ReactElement {
 						setShowForm(true);
 					}}
 					variant="primary"
+					size="sm"
 				>
 					<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
 						<PlusIcon size={iconSizeMd} color="currentColor" />

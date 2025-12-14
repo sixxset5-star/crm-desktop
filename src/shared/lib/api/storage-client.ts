@@ -103,3 +103,4 @@ export async function deleteAvatar(fileName: string): Promise<boolean> {
     return false;
   }
 }
+

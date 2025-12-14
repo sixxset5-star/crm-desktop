@@ -31,3 +31,4 @@ echo "📤 Теперь нужно force push:"
 echo "   git push -u origin main --force"
 echo ""
 echo "⚠️  Force push перезапишет историю на GitHub!"
+

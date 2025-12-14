@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import type { Credit, CreditScheduleItem } from '@/store/goals';
-import { formatCurrencyRub } from '@/shared/lib/format';
+import { formatCurrencyRub, formatDateWithSettings } from '@/shared/lib/format';
 import { EditIcon, TrashIcon } from '@/shared/components/Icons';
 import IconButton from '@/shared/components/IconButton';
 import { CreditField } from './CreditField';
@@ -29,6 +29,17 @@ export function EnhancedCreditCard({ credit, onEdit, onDelete, onViewSchedule }:
 	// Количество оплаченных платежей
 	const paidCount = hasSchedule ? credit.schedule.filter((item) => item.paid).length : 0;
 	const totalCount = hasSchedule ? credit.schedule.length : 0;
+
+	// Форматируем дату следующего платежа безопасно
+	const formatNextPaymentDate = (paymentDate?: string): string => {
+		if (!paymentDate) return '';
+		const date = new Date(paymentDate);
+		if (isNaN(date.getTime())) return '';
+		return formatDateWithSettings(paymentDate);
+	};
+
+	// Форматированная дата следующего платежа (вычисляем один раз)
+	const nextPaymentDateFormatted = nextPayment ? formatNextPaymentDate(nextPayment.paymentDate) : '';
 
 	return (
 		<div className={`${styles.card} ${!isActive ? styles.archived : ''}`}>
@@ -103,7 +114,8 @@ export function EnhancedCreditCard({ credit, onEdit, onDelete, onViewSchedule }:
 						<div className={styles.nextPayment}>
 							<span className={styles.nextPaymentLabel}>Ближайший платеж:</span>
 							<span className={styles.nextPaymentValue}>
-								{formatCurrencyRub(nextPayment.plannedPayment)} ({new Date(nextPayment.paymentDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })})
+								{formatCurrencyRub(nextPayment.plannedPayment)}
+								{nextPaymentDateFormatted && ` (${nextPaymentDateFormatted})`}
 							</span>
 						</div>
 					)}

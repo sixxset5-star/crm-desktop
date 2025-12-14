@@ -258,7 +258,7 @@ a {
 	font-weight: 500;
 	color: var(--text-secondary);
 	border: var(--border-width) solid transparent;
-	transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base), padding var(--transition-smooth), justify-content var(--transition-smooth);
+	transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base), padding var(--transition-smooth);
 	position: relative;
 	box-sizing: border-box;
 }
@@ -281,6 +281,7 @@ a {
 	color: var(--text-primary);
 	border: var(--border-width) solid var(--border-strong);
 	box-shadow: none;
+	justify-content: flex-start; /* Не центрируем активный элемент */
 }
 
 .nav-label {
@@ -350,7 +351,7 @@ a {
 	box-shadow: none !important;
 	padding: var(--space-sm) !important;
 	margin: 0 !important;
-	justify-content: center !important;
+	justify-content: center !important; /* В свернутом режиме центрируем */
 	align-items: center !important;
 	width: 100%;
 	box-sizing: border-box;
@@ -386,6 +387,13 @@ a {
 .sidebar .nav > div[style*="marginTop"] {
 	margin-top: var(--space-lg) !important;
 	margin-bottom: var(--space-xs) !important;
+	border-top: 1px solid var(--border-light);
+	padding-top: var(--space-md) !important;
+}
+
+.sidebar .nav > div[style*="marginTop"]:first-child {
+	border-top: none;
+	padding-top: 0 !important;
 }
 
 .sidebar .nav > div[style*="marginTop"] > div {
@@ -450,7 +458,8 @@ a {
 	border-radius: var(--radius-xl);
 	padding: var(--space-lg);
 	box-shadow: var(--surface-shadow);
-	overflow: visible;
+	overflow-x: hidden;
+	overflow-y: visible;
 	max-width: none;
 	width: 100%;
 	margin: var(--space-md);
@@ -474,7 +483,7 @@ a {
 .board {
 	display: grid;
 	grid-auto-flow: column;
-	grid-auto-columns: minmax(280px, 1fr);
+	grid-auto-columns: 280px;
 	gap: var(--space-md);
 	background: var(--panel-muted);
 	border-radius: var(--radius-l);
@@ -482,6 +491,7 @@ a {
 	border: 1px solid var(--border-strong);
 	box-shadow: inset 0 1px 0 color-mix(in srgb, var(--white) 40%, transparent);
 	overflow-x: auto;
+	width: 100%;
 }
 
 .board-column {
@@ -954,7 +964,608 @@ a {
 	border: none !important;
 }
 
-@media (max-width: 1200px) {
+/* Мобильное меню кнопка */
+.mobile-menu-button {
+	display: none;
+	position: fixed;
+	top: var(--space-md);
+	left: var(--space-md);
+	z-index: 1002; /* Выше всего контента и sidebar */
+	width: 44px;
+	height: 44px;
+	border-radius: var(--radius-m);
+	background: var(--panel);
+	border: 1px solid var(--border-strong);
+	color: var(--text);
+	cursor: pointer;
+	align-items: center;
+	justify-content: center;
+	box-shadow: var(--surface-shadow);
+	transition: background var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
+	/* Убеждаемся, что кнопка всегда видна */
+	pointer-events: auto;
+}
+
+.mobile-menu-button:hover {
+	background: var(--panel-muted);
+	transform: scale(1.05);
+}
+
+.mobile-menu-button:active {
+	transform: scale(0.95);
+}
+
+.mobile-menu-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: color-mix(in srgb, var(--black) 50%, transparent);
+	z-index: 999;
+	backdrop-filter: blur(4px);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+	.mobile-menu-button {
+		display: flex;
+	}
+
+	.mobile-menu-overlay {
+		display: block;
+	}
+
+	.app-root {
+		flex-direction: column;
+	}
+
+	.sidebar {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 280px;
+		max-width: 85vw;
+		height: 100vh;
+		max-height: 100vh;
+		margin: 0;
+		border-radius: 0;
+		border-right: 1px solid var(--border-strong);
+		border-top: none;
+		border-bottom: none;
+		border-left: none;
+		transform: translateX(-100%);
+		transition: transform var(--transition-smooth);
+		z-index: 1001; /* Выше контента, но ниже кнопки меню */
+		box-shadow: 4px 0 24px color-mix(in srgb, var(--text) 12%, transparent);
+	}
+
+	.sidebar.mobile-open {
+		transform: translateX(0);
+	}
+
+	.sidebar.collapsed {
+		width: 280px;
+		max-width: 85vw;
+		left: 0;
+		top: 0;
+		height: 100vh;
+		max-height: 100vh;
+		margin: 0;
+		border-radius: 0;
+		padding: var(--space-lg);
+		align-items: flex-start;
+		transform: translateX(-100%);
+	}
+
+	.sidebar.collapsed.mobile-open {
+		transform: translateX(0);
+	}
+
+	.sidebar.collapsed .sidebar-header {
+		flex-direction: row;
+		justify-content: space-between;
+		width: 100%;
+	}
+
+	.sidebar.collapsed .sidebar-brand {
+		justify-content: flex-start;
+		width: auto;
+	}
+
+	.sidebar.collapsed .nav {
+		align-items: flex-start;
+		padding-right: var(--space-xs);
+	}
+
+	.sidebar.collapsed .nav-item {
+		justify-content: flex-start;
+		width: 100%;
+		padding: var(--space-sm) var(--space-md);
+	}
+
+	.sidebar.collapsed .nav-label {
+		opacity: 1;
+		width: auto;
+		max-width: none;
+	}
+
+	.sidebar.collapsed .sidebar-brand-copy {
+		width: auto;
+		max-width: none;
+		opacity: 1;
+	}
+
+	.sidebar.collapsed .sidebar-brand-title,
+	.sidebar.collapsed .sidebar-brand-tagline {
+		opacity: 1;
+		width: auto;
+		max-width: none;
+	}
+
+	.sidebar.collapsed .section-header {
+		display: block;
+	}
+
+	.content {
+		margin: 0;
+		margin-left: 0;
+		border-radius: 0;
+		border: none;
+		border-top: 1px solid var(--border-strong);
+		padding: var(--space-md);
+		padding-top: calc(var(--space-md) + 44px + var(--space-md)); /* Отступ для кнопки меню */
+		min-height: 100vh;
+		box-shadow: none;
+		position: relative;
+		z-index: 1; /* Ниже кнопки меню (z-index: 1002) и sidebar (z-index: 1001) */
+	}
+
+	.app-root.sidebar-collapsed .content {
+		margin-left: 0;
+	}
+
+	.app-root.mobile-menu-open .content {
+		overflow: hidden;
+	}
+
+	/* Модальные окна на мобильных */
+	.modal {
+		width: 100%;
+		max-width: 100vw;
+		max-height: 100vh;
+		height: 100vh;
+		border-radius: 0;
+		margin: 0;
+		padding: var(--space-md);
+		overflow-y: auto;
+	}
+
+	.modal-backdrop {
+		padding: 0;
+		align-items: flex-start;
+	}
+
+	/* Footer в модальных окнах на мобильных - адаптируем кнопки */
+	.modal footer,
+	.modal > div[style*="justifyContent"] {
+		flex-direction: column !important;
+		gap: var(--space-sm) !important;
+	}
+
+	.modal footer > *,
+	.modal > div[style*="justifyContent"] > * {
+		width: 100% !important;
+	}
+
+	/* Input и формы на мобильных */
+	input[type="text"],
+	input[type="number"],
+	input[type="email"],
+	input[type="tel"],
+	textarea,
+	select {
+		font-size: 16px; /* Предотвращает зум на iOS */
+	}
+
+	/* Улучшаем touch targets на мобильных */
+	button,
+	a,
+	.nav-item {
+		min-height: 44px;
+		min-width: 44px;
+	}
+
+	/* Карточки на мобильных - убираем hover эффекты */
+	.card:hover {
+		transform: none;
+	}
+
+	/* Улучшаем скролл на мобильных */
+	.board {
+		-webkit-overflow-scrolling: touch;
+		scroll-snap-type: x proximity;
+	}
+
+	.board-column {
+		scroll-snap-align: start;
+	}
+
+	/* Формы на мобильных */
+	.form-grid {
+		grid-template-columns: 1fr;
+		gap: var(--space-md);
+	}
+
+	/* Доска на мобильных */
+	.board {
+		grid-auto-columns: minmax(260px, 1fr);
+		padding: var(--space-sm);
+		gap: var(--space-sm);
+	}
+
+	/* KPI карточки */
+	.kpis {
+		grid-template-columns: 1fr;
+	}
+
+	/* Таблицы на мобильных */
+	.table {
+		font-size: var(--font-size-sm);
+	}
+
+	.table th,
+	.table td {
+		padding: var(--space-sm);
+	}
+
+	/* Workload grid */
+	.workload-grid {
+		grid-template-columns: 1fr;
+	}
+
+	/* Taxes summary */
+	.taxes-summary {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 480px) {
+	.mobile-menu-button {
+		width: 40px;
+		height: 40px;
+		top: var(--space-sm);
+		left: var(--space-sm);
+	}
+
+	.sidebar {
+		width: 100%;
+		max-width: 100vw;
+	}
+
+	.content {
+		padding: var(--space-sm);
+		padding-top: calc(var(--space-sm) + 40px + var(--space-sm)); /* Отступ для меньшей кнопки */
+	}
+
+	.board {
+		grid-auto-columns: minmax(240px, 1fr);
+		padding: var(--space-xs);
+		gap: var(--space-xs);
+	}
+
+	.page-title {
+		font-size: 24px;
+	}
+
+	.page-subtitle {
+		font-size: var(--font-size-md);
+	}
+
+	/* Финансовые карточки - одна колонка */
+	.financial-summary-grid,
+	.financial-cards-grid {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Заголовки страниц на мобильных */
+	.page-title {
+		font-size: 20px !important;
+	}
+}
+
+/* Утилитарные классы для мобильной адаптации */
+@media (max-width: 768px) {
+	/* Grid с 2 колонками -> 1 колонка */
+	.grid-2-col {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Grid с 3 колонками -> 1 колонка */
+	.grid-3-col {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Grid с 4 колонками -> 1 колонка */
+	.grid-4-col {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Grid с auto-fill -> 1 колонка */
+	.grid-auto-fill {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Все grid-ы с repeat() -> одна колонка (кроме календаря) */
+	div[style*="gridTemplateColumns"][style*="repeat("]:not([style*="repeat(7"]) {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Grid с 1fr 1fr -> одна колонка */
+	div[style*="gridTemplateColumns"][style*="1fr 1fr"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Финансовые секции - все grid-ы в одну колонку */
+	section.financial div[style*="gridTemplateColumns"],
+	.financial div[style*="gridTemplateColumns"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Финансовые карточки в Dashboard - одна колонка */
+	.financial > div[style*="gridTemplateColumns"],
+	.financial section > div[style*="gridTemplateColumns"],
+	.financial > div > div[style*="gridTemplateColumns"],
+	.financial [style*="gridTemplateColumns"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Финансовые секции - все grid-ы в одну колонку */
+	section.financial div[style*="gridTemplateColumns"],
+	.financial div[style*="gridTemplateColumns"],
+	section.financial > div > div[style*="gridTemplateColumns"],
+	.financial > div > div[style*="gridTemplateColumns"] {
+		grid-template-columns: 1fr !important;
+		display: grid !important;
+	}
+
+	/* Переопределяем inline стили для финансовых grid-ов с repeat */
+	.financial div[style*="repeat(2"],
+	.financial div[style*="repeat(3"],
+	.financial div[style*="repeat(4"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Универсальный селектор для всех grid-ов в финансовой секции */
+	.financial > div[style*="display"][style*="grid"],
+	.financial div[style*="display"][style*="grid"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Карточки кредитов - уменьшаем grid внутри */
+	.credit-card > div[style*="gridTemplateColumns"],
+	.expense-card > div[style*="gridTemplateColumns"] {
+		grid-template-columns: 1fr !important;
+		gap: var(--space-sm) !important;
+	}
+
+	/* Калькулятор - одна колонка для основного layout */
+	[style*="gridTemplateColumns"][style*="1fr 1fr"][style*="gap"] {
+		grid-template-columns: 1fr !important;
+		gap: var(--space-md) !important;
+	}
+
+	/* Референсные карточки - поля в одну колонку */
+	[style*="gridTemplateColumns"][style*="1fr 1fr"][style*="alignItems"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Календарь на мобильных - уменьшаем размер ячеек */
+	.calendar-grid {
+		font-size: var(--font-size-xs);
+	}
+
+	.calendar-cell {
+		padding: var(--space-xs) !important;
+		min-height: 40px !important;
+	}
+
+	/* Карточки клиентов/подрядчиков на мобильных */
+	.customer-card,
+	.contractor-card {
+		min-width: 100%;
+	}
+
+	/* Заголовки страниц с кнопками - вертикальная компоновка */
+	[style*="justifyContent"][style*="space-between"] {
+		flex-direction: column !important;
+		align-items: stretch !important;
+		gap: var(--space-md) !important;
+	}
+
+	[style*="justifyContent"][style*="space-between"] button {
+		width: 100%;
+		justify-content: center;
+	}
+
+	/* Фильтры - вертикальная компоновка */
+	[style*="flexWrap"][style*="wrap"] {
+		flex-direction: column !important;
+	}
+
+	[style*="flexWrap"][style*="wrap"] > * {
+		width: 100% !important;
+		flex: 1 1 100% !important;
+		min-width: 100% !important;
+	}
+
+	/* Поиск на всю ширину */
+	input[type="text"][style*="flex"],
+	input[type="search"][style*="flex"] {
+		flex: 1 1 100% !important;
+		min-width: 100% !important;
+		width: 100% !important;
+	}
+
+	/* Графики и диаграммы - уменьшаем размер */
+	.chart-container,
+	canvas {
+		max-width: 100%;
+		height: auto !important;
+	}
+
+	/* Карточки кредитов и расходов */
+	.credit-card,
+	.expense-card {
+		min-width: 100%;
+	}
+
+	/* Календарь Workload - уменьшаем размер ячеек */
+	[style*="gridTemplateColumns"][style*="repeat(7"] {
+		grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+		font-size: var(--font-size-xs) !important;
+		gap: var(--space-xs) !important;
+		padding: var(--space-sm) !important;
+	}
+
+	[style*="gridTemplateColumns"][style*="repeat(7"] > * {
+		padding: var(--space-xs) !important;
+		min-height: 32px !important;
+		font-size: var(--font-size-xs) !important;
+	}
+
+	/* Графики - уменьшаем размер на мобильных */
+	.chart-container {
+		max-width: 100%;
+		overflow-x: auto;
+	}
+
+	.chart-container svg,
+	.chart-container canvas {
+		max-width: 100%;
+		height: auto;
+	}
+
+	/* Таблицы - адаптируем для мобильных */
+	table {
+		width: 100%;
+		font-size: var(--font-size-sm);
+	}
+
+	table th,
+	table td {
+		padding: var(--space-xs) var(--space-sm);
+		white-space: nowrap;
+	}
+
+	/* Карточки задач в Reports - одна колонка */
+	[style*="gridTemplateColumns"][style*="auto-fill"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Taxes - карточки метрик в одну колонку */
+	.taxes-header [style*="display"][style*="flex"][style*="gap"] {
+		flex-direction: column !important;
+	}
+
+	/* FinancialModel - заголовки с кнопками */
+	.financial-model-header {
+		flex-direction: column !important;
+		gap: var(--space-md) !important;
+	}
+
+	/* Calculator - заголовки с кнопками */
+	.calculator-header [style*="justifyContent"][style*="space-between"] {
+		flex-direction: column !important;
+		gap: var(--space-md) !important;
+	}
+
+	/* Calculator - кнопки в заголовках */
+	.calculator-header button {
+		width: 100%;
+	}
+
+	/* Все заголовки секций с кнопками - вертикальная компоновка */
+	section [style*="justifyContent"][style*="space-between"][style*="alignItems"][style*="center"] {
+		flex-direction: column !important;
+		align-items: flex-start !important;
+		gap: var(--space-sm) !important;
+	}
+
+	section [style*="justifyContent"][style*="space-between"][style*="alignItems"][style*="center"] button {
+		width: 100%;
+	}
+
+	/* Таблицы Taxes - горизонтальный скролл только если нужно */
+	.taxes-table-wrapper {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.taxes-table {
+		min-width: 600px;
+	}
+
+	/* Workload - заголовок календаря адаптация */
+	[style*="justifyContent"][style*="space-between"][style*="alignItems"][style*="center"]:has(button) {
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+	}
+
+	/* Archive - grid карточек в одну колонку */
+	[style*="gridTemplateColumns"][style*="auto-fill"][style*="minmax"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Калькулятор - одна колонка */
+	[style*="gridTemplateColumns"][style*="1fr 1fr"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* Формы в модальных окнах */
+	.modal form {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md);
+	}
+
+	.modal form label {
+		width: 100%;
+	}
+
+	.modal form input,
+	.modal form select,
+	.modal form textarea {
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	/* Tabs на мобильных - горизонтальный скролл только если нужно */
+	.tabs,
+	[role="tablist"] {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		flex-wrap: nowrap;
+	}
+
+	.tabs button,
+	[role="tab"] {
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+
+	/* Списки и контакты */
+	.contact-list,
+	.contact-item {
+		width: 100%;
+	}
+
+	/* Аватары в карточках */
+	.customer-card .avatar,
+	.contractor-card .avatar {
+		flex-shrink: 0;
+	}
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
 	.app-root {
 		flex-direction: column;
 	}
@@ -968,6 +1579,7 @@ a {
 		top: auto;
 		height: auto;
 		margin: var(--space-md);
+		border-radius: var(--radius-xl);
 	}
 
 	.content {
@@ -980,19 +1592,5 @@ a {
 
 	.app-root.sidebar-collapsed .content {
 		margin-left: var(--space-md);
-	}
-}
-
-@media (max-width: 700px) {
-	.sidebar {
-		padding: var(--space-md);
-	}
-
-	.content {
-		padding: var(--space-xl) var(--space-md);
-	}
-
-	.board {
-		grid-auto-columns: minmax(220px, 1fr);
 	}
 }

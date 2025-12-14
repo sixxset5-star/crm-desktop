@@ -164,7 +164,7 @@ export function TextArea(props: BaseInputProps & React.TextareaHTMLAttributes<HT
 }
 
 export function Select(props: BaseInputProps & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'>): React.ReactElement {
-	const { className, size, error, children, ...rest } = props;
+	const { className, size, error, children, style, ...rest } = props;
 	const classes = [
 		inputStyles.input,
 		inputStyles.select,
@@ -172,9 +172,15 @@ export function Select(props: BaseInputProps & Omit<React.SelectHTMLAttributes<H
 		error ? inputStyles.error : '',
 		className || '',
 	].join(' ').trim();
+	
+	// Если width: auto, применяем его и к wrapper
+	const wrapperStyle = style && (style.width === 'auto' || (typeof style.width === 'string' && style.width.includes('auto')))
+		? { ...style, width: 'auto' }
+		: undefined;
+	
 	return (
-		<div className={inputStyles.selectWrapper}>
-			<select {...rest} className={classes}>{children}</select>
+		<div className={inputStyles.selectWrapper} style={wrapperStyle}>
+			<select {...rest} className={classes} style={style}>{children}</select>
 		</div>
 	);
 }

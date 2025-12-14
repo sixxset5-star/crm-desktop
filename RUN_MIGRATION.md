@@ -46,3 +46,4 @@ node scripts/migrate-to-supabase.mjs
 2. Откройте приложение в браузере - данные должны быть там!
 
 Подробная инструкция: [`MIGRATE_DATA.md`](MIGRATE_DATA.md)
+

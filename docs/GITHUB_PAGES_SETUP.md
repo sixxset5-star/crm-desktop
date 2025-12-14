@@ -64,3 +64,4 @@ Workflow находится в `.github/workflows/deploy.yml` и автомат�
 1. Перейдите в **Actions** вкладку
 2. Выберите workflow `Deploy to GitHub Pages`
 3. Нажмите **Run workflow** → **Run workflow**
+

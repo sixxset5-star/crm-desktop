@@ -105,3 +105,4 @@ async function forceDeleteOldSettings() {
 }
 
 forceDeleteOldSettings();
+

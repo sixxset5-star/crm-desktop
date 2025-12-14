@@ -38,14 +38,15 @@ export function Taxes(): React.ReactElement {
 			<div
 				style={{
 					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-					gap: TAXES_HEADER_GAP,
+					flexDirection: 'column',
+					gap: 'var(--space-md)',
+					marginBottom: 'var(--space-md)',
 				}}
 			>
 				<div
 					style={{
 						display: 'flex',
+						flexDirection: 'column',
 						gap: 'var(--space-md)',
 					}}
 				>
@@ -68,7 +69,7 @@ export function Taxes(): React.ReactElement {
 					size="sm"
 					value={selectedYearKey}
 					onChange={(e) => setSelectedYearKey((e.target as HTMLSelectElement).value)}
-					style={{ width: 'auto', paddingRight: TAXES_SELECT_PADDING_RIGHT }}
+					style={{ width: '100%', paddingRight: TAXES_SELECT_PADDING_RIGHT }}
 				>
 					{availableYears.map((yk) => (
 						<option key={yk} value={yk}>
