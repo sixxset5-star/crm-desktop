@@ -612,13 +612,51 @@ export async function loadExtraWork(): Promise<ExtraWork[]> {
 
     if (!data) return [];
 
-    // Преобразуем JSON поля
-    return data.map((row: any) => ({
-      ...row,
-      workDates: typeof row.work_dates === 'string' ? JSON.parse(row.work_dates) : row.work_dates,
-      payments: typeof row.payments === 'string' ? JSON.parse(row.payments) : row.payments,
-      work_dates: undefined,
-    }));
+    // Преобразуем snake_case в camelCase и обрабатываем JSON поля
+    return data.map((row: any) => {
+      // В Supabase JSONB поля уже парсятся автоматически как объекты
+      // Если это строка - парсим, если объект/массив - используем как есть
+      let workDates: string[] = [];
+      let payments: any[] = [];
+      
+      if (row.work_dates) {
+        if (typeof row.work_dates === 'string') {
+          try {
+            workDates = JSON.parse(row.work_dates);
+          } catch (e) {
+            log.warn('Failed to parse work_dates', e);
+            workDates = [];
+          }
+        } else {
+          workDates = row.work_dates;
+        }
+      }
+      
+      if (row.payments) {
+        if (typeof row.payments === 'string') {
+          try {
+            payments = JSON.parse(row.payments);
+          } catch (e) {
+            log.warn('Failed to parse payments', e);
+            payments = [];
+          }
+        } else {
+          payments = row.payments;
+        }
+      }
+      
+      return {
+        id: row.id,
+        workDates,
+        dailyRate: row.daily_rate,
+        weekendRate: row.weekend_rate != null ? row.weekend_rate : undefined,
+        totalAmount: row.total_amount,
+        payments,
+        notes: row.notes || undefined,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      };
+    });
   } catch (error) {
     log.error('Error loading extra work', error);
     return [];
@@ -653,3 +691,4 @@ export async function saveExtraWork(extraWork: ExtraWork[]): Promise<void> {
     throw error;
   }
 }
+
