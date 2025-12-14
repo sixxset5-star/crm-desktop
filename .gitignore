@@ -3,8 +3,9 @@ node_modules
 dist/
 release/
 *.log
-*.sql
 *.tar.gz
+# Allow SQL migrations
+!supabase/migrations/*.sql
 *.asar
 app.asar
 Из ПАПКИ/
