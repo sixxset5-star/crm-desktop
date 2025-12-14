@@ -234,37 +234,32 @@ export async function loadGoals(): Promise<{
   credits: Credit[];
 }> {
   try {
-    const [goalsResult, monthlyGoalsResult, creditsResult] = await Promise.all([
-      supabase.from('goals').select('*').order('deadline', { ascending: true }),
-      supabase.from('monthly_financial_goals').select('*'),
-      supabase.from('credits').select('*').order('start_date', { ascending: false }),
-    ]);
+    // Загружаем цели
+    const { data: goals, error: goalsError } = await supabase
+      .from('goals')
+      .select('*')
+      .order('deadline', { ascending: false });
 
-    if (goalsResult.error) log.error('Failed to load goals', goalsResult.error);
-    if (monthlyGoalsResult.error) log.error('Failed to load monthly goals', monthlyGoalsResult.error);
-    if (creditsResult.error) log.error('Failed to load credits', creditsResult.error);
+    if (goalsError) throw goalsError;
 
-    // Загружаем графики платежей для кредитов
-    const credits = creditsResult.data || [];
-    const creditsWithSchedules = await Promise.all(
-      credits.map(async (credit) => {
-        const { data: schedule } = await supabase
-          .from('credit_schedule_items')
-          .select('*')
-          .eq('credit_id', credit.id)
-          .order('payment_date', { ascending: true });
+    // Загружаем месячные финансовые цели
+    const { data: monthlyGoals, error: monthlyError } = await supabase
+      .from('monthly_financial_goals')
+      .select('*')
+      .order('month_key', { ascending: false });
 
-        return {
-          ...credit,
-          schedule: (schedule || []) as CreditScheduleItem[],
-        };
-      })
-    );
+    if (monthlyError) throw monthlyError;
+
+    // Загружаем кредиты (будет загружено отдельно через loadCredits)
+    const credits: Credit[] = [];
 
     return {
-      goals: goalsResult.data || [],
-      monthlyFinancialGoals: monthlyGoalsResult.data || [],
-      credits: creditsWithSchedules,
+      goals: (goals || []) as Goal[],
+      monthlyFinancialGoals: (monthlyGoals || []).map((g: any) => ({
+        ...g,
+        expenses: typeof g.expenses === 'string' ? JSON.parse(g.expenses) : g.expenses,
+      })) as MonthlyFinancialGoal[],
+      credits,
     };
   } catch (error) {
     log.error('Error loading goals', error);
@@ -446,32 +441,38 @@ export async function saveIncomes(incomes: Income[]): Promise<void> {
 
 export async function loadSettings(): Promise<Settings | null> {
   try {
-    const { data, error } = await supabase.from('settings').select('*');
+    // В SQLite настройки хранятся как одна запись с key='main'
+    // Проверяем, есть ли такая запись
+    const { data, error } = await supabase
+      .from('settings')
+      .select('*')
+      .eq('key', 'main')
+      .single();
 
     if (error) {
+      // Если записи нет - это нормально (первый запуск)
+      if (error.code === 'PGRST116') {
+        return null;
+      }
       log.error('Failed to load settings', error);
       return null;
     }
 
-    if (!data || data.length === 0) {
+    if (!data || !data.value) {
       return null;
     }
 
-    // Преобразуем массив записей в объект Settings
-    // В Supabase value уже JSONB (объект), не нужно парсить
-    const settings: Partial<Settings> = {};
-    for (const row of data) {
-      try {
-        // В Supabase JSONB уже парсится автоматически
-        // Если это строка - парсим, если объект - используем как есть
-        const value = typeof row.value === 'string' ? JSON.parse(row.value) : row.value;
-        settings[row.key as keyof Settings] = value;
-      } catch (parseError) {
-        log.warn(`Failed to parse setting ${row.key}`, parseError);
-      }
+    // В Supabase JSONB уже парсится автоматически
+    // Если это строка - парсим, если объект - используем как есть
+    let settings: Settings;
+    try {
+      settings = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+    } catch (parseError) {
+      log.error('Failed to parse settings value', parseError);
+      return null;
     }
 
-    return settings as Settings;
+    return settings;
   } catch (error) {
     log.error('Error loading settings', error);
     return null;
@@ -552,14 +553,7 @@ export async function loadTaxes(): Promise<TaxPaidFlag[]> {
       return [];
     }
 
-    // Преобразуем из формата { key: string, paid: number } в TaxPaidFlag
-    return (data || []).map((row) => ({
-      id: row.key,
-      taxType: row.key.split('_')[0],
-      year: parseInt(row.key.split('_')[1]),
-      month: row.key.includes('_') && row.key.split('_').length > 2 ? parseInt(row.key.split('_')[2]) : undefined,
-      paid: row.paid === 1,
-    })) as TaxPaidFlag[];
+    return (data || []) as TaxPaidFlag[];
   } catch (error) {
     log.error('Error loading taxes', error);
     return [];
@@ -573,13 +567,9 @@ export async function saveTaxes(taxes: TaxPaidFlag[]): Promise<void> {
       return;
     }
 
-    // Преобразуем в формат БД
-    const taxesArray = taxes.map((tax) => ({
-      key: tax.id,
-      paid: tax.paid ? 1 : 0,
-    }));
-
-    const { error } = await supabase.from('tax_paid_flags').upsert(taxesArray, { onConflict: 'key' });
+    const { error } = await supabase
+      .from('tax_paid_flags')
+      .upsert(taxes, { onConflict: 'key' });
 
     if (error) {
       log.error('Failed to save taxes', error);
@@ -605,7 +595,15 @@ export async function loadExtraWork(): Promise<ExtraWork[]> {
       return [];
     }
 
-    return data || [];
+    if (!data) return [];
+
+    // Преобразуем JSON поля
+    return data.map((row: any) => ({
+      ...row,
+      workDates: typeof row.work_dates === 'string' ? JSON.parse(row.work_dates) : row.work_dates,
+      payments: typeof row.payments === 'string' ? JSON.parse(row.payments) : row.payments,
+      work_dates: undefined,
+    }));
   } catch (error) {
     log.error('Error loading extra work', error);
     return [];
@@ -619,9 +617,17 @@ export async function saveExtraWork(extraWork: ExtraWork[]): Promise<void> {
       return;
     }
 
+    // Преобразуем camelCase в snake_case
+    const dbExtraWork = extraWork.map((work: any) => ({
+      ...work,
+      work_dates: work.workDates ? (typeof work.workDates === 'string' ? work.workDates : JSON.stringify(work.workDates)) : null,
+      payments: work.payments ? (typeof work.payments === 'string' ? work.payments : JSON.stringify(work.payments)) : null,
+      workDates: undefined,
+    }));
+
     const { error } = await supabase
       .from('extra_work')
-      .upsert(extraWork, { onConflict: 'id' });
+      .upsert(dbExtraWork, { onConflict: 'id' });
 
     if (error) {
       log.error('Failed to save extra work', error);
