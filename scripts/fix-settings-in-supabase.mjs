@@ -73,16 +73,31 @@ async function fixSettings() {
     }
 
     // 2. Удаляем все старые записи в Supabase (если есть)
-    console.log('\n🗑️  Удаляем старые записи настроек из Supabase...');
-    const { error: deleteError } = await supabase
-      .from('settings')
-      .delete()
-      .neq('key', 'non-existent-key'); // Удаляем все записи
+    console.log('\n🗑️  Удаляем все записи настроек из Supabase...');
     
-    if (deleteError && !deleteError.message.includes('0 rows')) {
-      console.error('   ⚠️  Ошибка при удалении:', deleteError.message);
+    // Сначала получаем все записи чтобы увидеть что там
+    const { data: allSettings } = await supabase.from('settings').select('key');
+    if (allSettings && allSettings.length > 0) {
+      console.log(`   Найдено записей: ${allSettings.length}`);
+      for (const s of allSettings) {
+        console.log(`   - key: "${s.key}"`);
+      }
+      
+      // Удаляем каждую запись отдельно (более надежно)
+      for (const setting of allSettings) {
+        const { error: delError } = await supabase
+          .from('settings')
+          .delete()
+          .eq('key', setting.key);
+        
+        if (delError) {
+          console.error(`   ⚠️  Ошибка при удалении записи "${setting.key}":`, delError.message);
+        } else {
+          console.log(`   ✅ Удалена запись: "${setting.key}"`);
+        }
+      }
     } else {
-      console.log('   ✅ Старые записи удалены');
+      console.log('   Нет записей для удаления');
     }
 
     // 3. Сохраняем правильную структуру
