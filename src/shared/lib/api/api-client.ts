@@ -32,40 +32,58 @@ export async function loadTasks(): Promise<Task[]> {
     if (!data) return [];
 
     // Преобразуем snake_case в camelCase
-    return data.map((row: any) => ({
-      ...row,
-      paidAmount: row.paid_amount,
-      expensesEntries: row.expenses_entries ? (typeof row.expenses_entries === 'string' ? JSON.parse(row.expenses_entries) : row.expenses_entries) : [],
-      pausedRanges: row.paused_ranges ? (typeof row.paused_ranges === 'string' ? JSON.parse(row.paused_ranges) : row.paused_ranges) : [],
-      taxRate: row.tax_rate,
-      startDate: row.start_date,
-      subtasks: row.subtasks ? (typeof row.subtasks === 'string' ? JSON.parse(row.subtasks) : row.subtasks) : [],
-      tags: row.tags ? (typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags) : [],
-      customerId: row.customer_id,
-      links: row.links ? (typeof row.links === 'string' ? JSON.parse(row.links) : row.links) : [],
-      files: row.files ? (typeof row.files === 'string' ? JSON.parse(row.files) : row.files) : [],
-      calculatorQuantity: row.calculator_quantity,
-      calculatorPricePerUnit: row.calculator_price_per_unit,
-      accesses: row.accesses ? (typeof row.accesses === 'string' ? JSON.parse(row.accesses) : row.accesses) : [],
-      columnId: row.column_id,
-      pausedFromColumnId: row.paused_from_column_id,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-      payments: row.payments ? (typeof row.payments === 'string' ? JSON.parse(row.payments) : row.payments) : [],
-      // Удаляем snake_case поля
-      paid_amount: undefined,
-      expenses_entries: undefined,
-      paused_ranges: undefined,
-      tax_rate: undefined,
-      start_date: undefined,
-      customer_id: undefined,
-      calculator_quantity: undefined,
-      calculator_price_per_unit: undefined,
-      paused_from_column_id: undefined,
-      created_at: undefined,
-      updated_at: undefined,
-      column_id: undefined,
-    }));
+    return data.map((row: any) => {
+      const {
+        paid_amount,
+        expenses_entries,
+        paused_ranges,
+        tax_rate,
+        start_date,
+        customer_id,
+        calculator_quantity,
+        calculator_price_per_unit,
+        paused_from_column_id,
+        created_at,
+        updated_at,
+        column_id,
+        ...rest
+      } = row;
+
+      // Вспомогательная функция для парсинга JSON полей
+      const parseJsonField = (value: any) => {
+        if (!value) return null;
+        if (typeof value === 'string') {
+          try {
+            return JSON.parse(value);
+          } catch {
+            return value;
+          }
+        }
+        return value; // Уже объект (JSONB)
+      };
+
+      return {
+        ...rest,
+        paidAmount: row.paid_amount,
+        expensesEntries: parseJsonField(row.expenses_entries) ?? [],
+        pausedRanges: parseJsonField(row.paused_ranges) ?? [],
+        taxRate: row.tax_rate,
+        startDate: row.start_date,
+        subtasks: parseJsonField(row.subtasks) ?? [],
+        tags: parseJsonField(row.tags) ?? [],
+        customerId: row.customer_id,
+        links: parseJsonField(row.links) ?? [],
+        files: parseJsonField(row.files) ?? [],
+        calculatorQuantity: row.calculator_quantity,
+        calculatorPricePerUnit: row.calculator_price_per_unit,
+        accesses: parseJsonField(row.accesses) ?? [],
+        columnId: row.column_id ?? 'unprocessed', // Важно: дефолтное значение
+        pausedFromColumnId: row.paused_from_column_id,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        payments: parseJsonField(row.payments) ?? [],
+      };
+    });
   } catch (error) {
     log.error('Error loading tasks', error);
     return [];
