@@ -4,7 +4,9 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.VERCEL ? '/' : './', // Абсолютный путь для веб, относительный для Electron
+  // Для GitHub Pages нужен base path, для Vercel - '/', для Electron - './'
+  // В GitHub Actions GITHUB_PAGES=true автоматически устанавливается
+  base: process.env.GITHUB_PAGES === 'true' ? '/crm-desktop/' : (process.env.VERCEL ? '/' : './'),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
