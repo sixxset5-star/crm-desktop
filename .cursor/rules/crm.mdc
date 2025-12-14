@@ -11,3 +11,10 @@ alwaysApply: true
 - Tests: hooks/components get RTL tests for branching logic; visual-only pieces at least snapshot + accessibility check.
 - Styling: use the design tokens helper; no ad-hoc hex values inside components unless token missing (then file a TODO).
 - Любые повторяющиеся элементы выносим в параметризованные компоненты: без дублирования разметки, все отличия передаются через пропсы.
+
+## Git и деплой
+
+- **НЕ делать деплои вручную** - Vercel автоматически деплоит при каждом `git push` в main.
+- **Делать `git push` только после всех изменений**, когда все файлы готовы и протестированы.
+- Избегать множественных коммитов подряд - это расходует лимит деплоев в Vercel (100 в день на free плане).
+- Если нужно внести несколько изменений, лучше собрать их в один коммит или несколько связанных коммитов перед push.
