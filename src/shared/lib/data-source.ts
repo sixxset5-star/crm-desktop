@@ -130,9 +130,11 @@ export async function saveGoals(data: {
 
 export async function loadCredits(): Promise<Array<Credit & { schedule: CreditScheduleItem[] }>> {
   if (isElectron()) {
+    // В Electron loadCreditsFromDisk возвращает объект с credits, needsMigration и т.д.
     const result = await loadCreditsFromDisk();
     return result.credits || [];
   } else {
+    // В браузере просто возвращаем массив
     return await apiClient.loadCredits();
   }
 }
