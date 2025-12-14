@@ -1,0 +1,158 @@
+/* Base input styles aligned with variables in src/styles.css */
+.input {
+	border: var(--border-width) solid var(--border);
+	background: var(--panel);
+	color: var(--text-primary);
+	border-radius: var(--radius-pill);
+	height: var(--control-xl-height);
+	padding: 0 var(--space-md);
+	font: inherit;
+	box-sizing: border-box;
+	width: 100%;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.input:focus {
+	outline: var(--border-default);
+	outline-offset: var(--input-focus-offset);
+	border-color: var(--accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.input.error {
+	border-color: var(--red);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 12%, transparent);
+}
+.textarea {
+	resize: vertical;
+	border-radius: var(--radius-pill);
+	height: auto;
+	min-height: var(--input-textarea-min-height);
+	padding: var(--space-md);
+	line-height: var(--line-height-base);
+}
+.selectWrapper {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+	min-width: 0;
+}
+.select {
+	appearance: none;
+	font-size: inherit; /* keep size consistent with TextInput */
+	line-height: 1.2;
+	padding-right: var(--input-select-padding-right);
+	width: 100%;
+}
+/* Arrow icon using --muted token from tokens.css via mask */
+.selectWrapper::after {
+	content: '';
+	position: absolute;
+	right: var(--input-select-icon-offset);
+	top: 50%;
+	transform: translateY(-50%);
+	width: var(--input-select-icon-size);
+	height: var(--input-select-icon-size);
+	background-color: var(--muted);
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+	-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
+	pointer-events: none;
+	z-index: 1;
+}
+.select.xs {
+	/* Pill-like select as requested */
+	height: var(--control-xs-height);
+	padding: 0 var(--space-md);
+	padding-right: var(--space-xl);
+	border-radius: var(--radius-pill);
+	line-height: var(--control-xs-height);
+}
+.xs { height: var(--control-xs-height); padding: 0 var(--space-md); border-radius: var(--radius-pill); font-size: var(--font-size-sm); line-height: 1.2; }
+.sm { height: var(--control-sm-height); padding: 0 var(--space-md); border-radius: var(--radius-pill); font-size: var(--font-size-sm); }
+.md { height: var(--control-md-height); padding: 0 var(--space-md); border-radius: var(--radius-pill); }
+.lg { height: var(--control-lg-height); padding: 0 var(--space-lg); border-radius: var(--radius-pill); }
+
+.label {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-xs);
+}
+.labelText {
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+	font-weight: 500;
+}
+
+/* Simple unified checkbox/radio */
+.checkbox, .radio {
+	width: var(--input-checkbox-size) !important;
+	height: var(--input-checkbox-size) !important;
+	min-width: var(--input-checkbox-size) !important;
+	min-height: var(--input-checkbox-size) !important;
+	max-width: var(--input-checkbox-size) !important;
+	max-height: var(--input-checkbox-size) !important;
+	aspect-ratio: 1 !important;
+	accent-color: var(--accent);
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	border: var(--border-width) solid var(--border);
+	border-radius: var(--space-xs) !important;
+	background: var(--panel);
+	position: relative;
+	box-sizing: border-box !important;
+	padding: 0 !important;
+	margin: 0;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+	flex-shrink: 0;
+}
+
+.checkbox:checked, .radio:checked {
+	background: var(--accent);
+	border-color: var(--accent);
+}
+
+.checkbox:checked::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: var(--icon-size-xs);
+	height: calc(var(--icon-size-xs) * 0.75);
+	transform: translate(-50%, -60%);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'%3E%3Cpath d='M1 3 L3 5 L7 1' stroke='%23ffffff' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+}
+
+.radio {
+	border-radius: 50% !important;
+}
+
+.radio:checked::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: var(--icon-size-xs);
+	height: var(--icon-size-xs);
+	transform: translate(-50%, -50%);
+	border-radius: 50%;
+	background: var(--white);
+}
+
+
+
+
+
+
+
+
+
+
+

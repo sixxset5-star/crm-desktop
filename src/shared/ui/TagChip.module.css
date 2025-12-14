@@ -1,0 +1,50 @@
+._chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--chip-padding-y) var(--chip-padding-x);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: var(--line-height-tight);
+  background: var(--panel-muted);
+  color: var(--text-primary);
+  border: none;
+  outline: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+._chip:disabled {
+  cursor: default;
+}
+
+._clickable {
+  cursor: pointer;
+}
+
+._clickable:hover {
+  background: var(--panel-hover);
+}
+
+._accent {
+  background: var(--accent);
+  color: var(--white);
+}
+
+._ghost {
+  background: var(--panel);
+  color: var(--accent);
+}
+._ghost:hover {
+  background: var(--panel-hover);
+}
+
+
+
+
+
+
+
+
+
+
+

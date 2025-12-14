@@ -1,0 +1,54 @@
+/* Пульсация (3 шага) */
+.time {
+	position: relative;
+	padding-left: 18px;
+}
+
+.time::before,
+.time::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 4px; /* центр относительно маленькой точки */
+	transform: translate(-50%, -50%);
+	border-radius: 50%;
+}
+
+/* Верхний (малый) кружок */
+.time::before {
+	width: 8px;
+	height: 8px;
+	background-color: var(--green-active);
+	z-index: 2;
+}
+
+/* Нижний (анимируемый) кружок */
+.time::after {
+	width: 12px;
+	height: 12px;
+	background-color: color-mix(in srgb, var(--green-active) 50%, transparent);
+	z-index: 1;
+	animation: pulse3 1.5s infinite;
+	will-change: transform, opacity;
+}
+
+/* 0%→55% — ease-in; 55%→100% — ease-out */
+@keyframes pulse3 {
+	0% {
+		animation-timing-function: ease-in;               /* шаг 1 — ease-in */
+		transform: translate(-50%, -50%) scale(0.6667);  /* 8/12 */
+		opacity: 0.5;
+	}
+	55% {
+		animation-timing-function: ease-out;              /* шаг 2 — ease-out */
+		transform: translate(-50%, -50%) scale(1.2);
+		opacity: 0.45;
+	}
+	100% {
+		transform: translate(-50%, -50%) scale(1.8);
+		opacity: 0;
+	}
+}
+
+
+

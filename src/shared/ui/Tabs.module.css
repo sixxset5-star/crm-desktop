@@ -1,0 +1,48 @@
+/* Tabs styles use existing tokens */
+.tabs {
+	display: flex;
+	flex-direction: column;
+	gap: var(--tabs-gap);
+}
+.tablist {
+	display: inline-flex;
+	gap: var(--tabs-list-gap);
+	background: var(--panel);
+	border: var(--border-default);
+	border-radius: var(--radius-s);
+	padding: var(--tabs-list-padding);
+}
+.tab {
+	border: 0;
+	background: transparent;
+	color: var(--text-secondary);
+	cursor: pointer;
+	border-radius: var(--tabs-tab-radius);
+	height: var(--control-sm-height);
+	padding: 0 var(--space-md);
+	font: inherit;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+}
+.tab[aria-selected="true"] {
+	background: var(--panel-selected);
+	color: var(--text-primary);
+}
+.tabpanel {
+	background: var(--panel);
+	border: none;
+	border-radius: var(--radius-s);
+	padding: var(--space-lg);
+}
+
+
+
+
+
+
+
+
+
+
+

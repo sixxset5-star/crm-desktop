@@ -1,0 +1,10 @@
+.loadingFallback {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	color: var(--muted);
+	font-size: var(--font-size-sm);
+}
+
+

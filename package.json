@@ -1,0 +1,92 @@
+{
+  "name": "crm-desktop",
+  "productName": "CRM Desktop",
+  "version": "0.1.13",
+  "private": true,
+  "main": "electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "dev:swift": "nodemon --watch apple/Sources --ext swift --exec \"cd apple && swift run -c debug CRMNativeHost\"",
+    "dev:stop": "bash devtools/kill-dev.sh || pwsh devtools/dev-stop.ps1 || true",
+    "dev-native": "npm run dev:stop && concurrently -k -n SWIFT,WEB,ELEC -c blue,magenta,green \"npm:dev:swift\" \"vite\" \"cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "start-native": "npm run dev:stop && cd apple && swift run -c release CRMNativeHost",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "npm run build && cross-env VITE_DEV_SERVER_URL= electron .",
+    "create-shortcut": "node scripts/create-shortcut.js",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "serve:updates": "node scripts/serve-updates.mjs",
+    "version:bump": "node scripts/bump-version.mjs",
+    "release:clean": "node scripts/clean-release.mjs",
+    "release:prep-local": "npm run release:clean && npm run version:bump -- patch && AUTO_UPDATE_URL=http://localhost:9000 npm run dist:mac",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@types/react-window": "^1.8.8",
+    "better-sqlite3": "^12.4.6",
+    "electron-updater": "^6.3.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "react-window": "^1.8.11",
+    "zod": "^4.1.13",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^18.3.6",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3",
+    "electron-devtools-installer": "^4.0.0",
+    "electron-rebuild": "^3.2.9",
+    "express": "^4.21.1",
+    "jsdom": "^27.2.0",
+    "nodemon": "^3.1.7",
+    "serve-static": "^1.16.2",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.8",
+    "vitest": "^4.0.14"
+  },
+  "build": {
+    "appId": "com.mansurov.crm",
+    "productName": "CRM Desktop",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.icns"
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://example.com/crm-desktop-updates"
+      }
+    ]
+  }
+}

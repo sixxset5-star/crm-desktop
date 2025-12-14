@@ -1,0 +1,182 @@
+.container {
+	position: fixed;
+	bottom: var(--space-lg);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10000;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-sm);
+	align-items: center;
+	pointer-events: none;
+	width: 100%;
+	max-width: calc(var(--space-xl) * 10.5); /* ~420px */
+	padding: 0 var(--space-md);
+}
+
+.toastItem {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--space-md);
+	background: var(--panel);
+	color: var(--text);
+	padding: var(--space-md) var(--space-lg);
+	border-radius: var(--radius-l);
+	border: var(--border-width) solid var(--border);
+	box-shadow: var(--shadow-lg);
+	min-height: calc(var(--control-lg-height) + var(--space-md));
+	width: 100%;
+	opacity: 0;
+	transform: translateY(var(--space-md)) scale(0.96);
+	transition: all var(--transition-smooth);
+	backdrop-filter: blur(var(--space-md));
+	will-change: transform, opacity;
+	pointer-events: auto;
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+}
+
+.toastItem::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: var(--space-xs);
+	background: var(--border);
+	transition: background var(--transition-base);
+}
+
+.toastItem.visible {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+}
+
+.toastItem.exiting {
+	opacity: 0;
+	transform: translateY(calc(-1 * var(--space-sm))) scale(0.96);
+}
+
+.toastItem:hover {
+	box-shadow: var(--shadow-lg), 0 0 0 1px var(--border-strong);
+	transform: translateY(calc(-1 * var(--space-xs) / 2)) scale(1);
+}
+
+.toastItem.toastSuccess::before {
+	background: var(--green);
+}
+
+.toastItem.toastWarning::before {
+	background: var(--warning);
+}
+
+.toastItem.toastInfo::before {
+	background: var(--accent);
+}
+
+.toastIcon {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--control-sm-height);
+	height: var(--control-sm-height);
+	border-radius: var(--radius-md);
+	background: color-mix(in srgb, var(--bg) 60%, transparent);
+	transition: background var(--transition-base);
+}
+
+.toastItem.toastSuccess .toastIcon {
+	background: color-mix(in srgb, var(--green) 12%, transparent);
+	color: var(--green);
+}
+
+.toastItem.toastWarning .toastIcon {
+	background: color-mix(in srgb, var(--warning) 12%, transparent);
+	color: var(--warning);
+}
+
+.toastItem.toastInfo .toastIcon {
+	background: color-mix(in srgb, var(--accent) 12%, transparent);
+	color: var(--accent);
+}
+
+.toastContent {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-xs);
+	min-width: 0;
+}
+
+.toastTitle {
+	font-size: var(--font-size-md);
+	font-weight: 600;
+	line-height: var(--line-height-tight);
+	color: var(--text-primary);
+	letter-spacing: -0.01em;
+}
+
+.toastSubtitle {
+	font-size: var(--font-size-sm);
+	line-height: var(--line-height-base);
+	color: var(--text-secondary);
+	opacity: var(--opacity-subtle);
+}
+
+.toastClose {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(var(--control-xs-height) - var(--space-xs));
+	height: calc(var(--control-xs-height) - var(--space-xs));
+	border-radius: var(--radius-md);
+	background: transparent;
+	border: none;
+	color: var(--text-tertiary);
+	cursor: pointer;
+	transition: all var(--transition-base);
+	padding: 0;
+	margin: calc(-1 * var(--space-xs)) calc(-1 * var(--space-xs)) 0 0;
+}
+
+.toastClose:hover {
+	background: color-mix(in srgb, var(--text) 8%, transparent);
+	color: var(--text-primary);
+}
+
+.toastClose:active {
+	transform: scale(0.95);
+}
+
+/* Анимация появления для первого элемента */
+.container > .toastItem:first-child {
+	animation: slideInUp var(--transition-smooth) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideInUp {
+	from {
+		opacity: 0;
+		transform: translateY(var(--space-lg)) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+/* Адаптивность */
+@media (max-width: var(--breakpoint-mobile)) {
+	.container {
+		max-width: calc(100% - var(--space-md) * 2);
+		padding: 0 var(--space-md);
+	}
+
+	.toastItem {
+		padding: var(--space-md);
+		min-height: calc(var(--control-md-height) + var(--space-md));
+	}
+}
+

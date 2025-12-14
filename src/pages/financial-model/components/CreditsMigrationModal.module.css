@@ -1,0 +1,85 @@
+.container {
+	padding: var(--space-md);
+}
+
+.message {
+	margin-bottom: var(--space-lg);
+	line-height: 1.6;
+	color: var(--text);
+}
+
+.message p {
+	margin: 0 0 var(--space-sm) 0;
+}
+
+.message p:last-child {
+	margin-bottom: 0;
+}
+
+.creditsList {
+	margin-top: var(--space-lg);
+}
+
+.listTitle {
+	margin: 0 0 var(--space-md) 0;
+	font-size: var(--font-size-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--text);
+}
+
+.creditItem {
+	padding: var(--space-md);
+	background: var(--panel);
+	border: var(--border-width) solid var(--border);
+	border-radius: var(--radius-md);
+	margin-bottom: var(--space-sm);
+}
+
+.creditItem:last-child {
+	margin-bottom: 0;
+}
+
+.creditName {
+	font-size: var(--font-size-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--text);
+	margin-bottom: var(--space-sm);
+}
+
+.creditDetails {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-sm);
+	align-items: center;
+}
+
+.detail {
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+	padding: var(--space-xs) var(--space-sm);
+	background: var(--bg);
+	border-radius: var(--radius-md);
+}
+
+.warning {
+	font-size: var(--font-size-sm);
+	color: var(--warning);
+	font-weight: var(--font-weight-semibold);
+}
+
+.success {
+	font-size: var(--font-size-sm);
+	color: var(--green);
+	font-weight: var(--font-weight-semibold);
+}
+
+.progress {
+	margin-top: var(--space-md);
+	padding: var(--space-md);
+	background: var(--panel-muted);
+	border-radius: var(--radius-md);
+	text-align: center;
+	color: var(--text-secondary);
+	font-size: var(--font-size-sm);
+}
+

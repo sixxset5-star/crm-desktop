@@ -1,0 +1,37 @@
+._badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--chip-gap);
+	font-size: var(--font-size-xs);
+	font-weight: 600;
+	padding: var(--chip-padding-y) var(--space-sm);
+	border-radius: var(--radius-pill);
+	color: var(--text-primary);
+	box-shadow: none;
+	white-space: nowrap;
+	line-height: 1.2;
+}
+._high {
+	color: var(--red);
+	background: color-mix(in srgb, var(--red) 15%, transparent);
+}
+._medium {
+	color: var(--warning);
+	background: color-mix(in srgb, var(--warning) 15%, transparent);
+}
+._low {
+	color: var(--text-secondary);
+	background: color-mix(in srgb, var(--muted) 18%, transparent);
+}
+
+
+
+
+
+
+
+
+
+
+

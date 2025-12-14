@@ -1,0 +1,29 @@
+._chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--chip-gap);
+  padding: var(--chip-padding-y) var(--chip-padding-x) var(--chip-padding-y) var(--space-xs);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+}
+._avatar {
+  width: var(--avatar-size-chip);
+  height: var(--avatar-size-chip);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-weight: 700;
+  font-size: var(--font-size-xs);
+  object-fit: cover;
+  border: var(--border-default);
+  flex-shrink: 0;
+}
+._name {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+

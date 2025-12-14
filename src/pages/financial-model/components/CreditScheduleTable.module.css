@@ -1,0 +1,83 @@
+.viewModeToggle {
+	margin-bottom: var(--space-md);
+	display: flex;
+	gap: var(--space-sm);
+}
+
+.viewModeButton {
+	padding: var(--space-xs) var(--space-sm);
+	border: var(--border-default);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	font-size: var(--font-size-sm);
+	transition: var(--transition-base);
+}
+
+.viewModeButtonActive {
+	background: var(--accent);
+	color: var(--white);
+}
+
+.viewModeButtonInactive {
+	background: var(--panel);
+	color: var(--text);
+}
+
+.viewModeButtonInactive:hover {
+	background: var(--panel-hover);
+}
+
+.tableContainer {
+	overflow-x: auto;
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+.overdueRow {
+	background: color-mix(in srgb, var(--red) 10%, transparent);
+}
+
+.paidRow {
+	opacity: var(--opacity-disabled);
+}
+
+.paidAmountContainer {
+	display: flex;
+	gap: var(--space-xs);
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.paidAmountInput {
+	width: 80px;
+	padding: var(--space-xs);
+	border: var(--border-default);
+	border-radius: var(--radius-md);
+	font-size: var(--font-size-sm);
+}
+
+.paidAmountEditButton {
+	padding: 2px 4px;
+	font-size: var(--font-size-xs);
+	background: transparent;
+	border: none;
+	color: var(--muted);
+	cursor: pointer;
+}
+
+.paidAmountEditButton:hover {
+	color: var(--text);
+}
+
+.overdueLabel {
+	margin-left: var(--space-xs);
+	color: var(--red);
+	font-size: var(--font-size-xs);
+}
+
+.emptyState {
+	text-align: center;
+	color: var(--text-secondary);
+	padding: var(--space-xl);
+}
+

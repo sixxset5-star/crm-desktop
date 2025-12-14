@@ -1,0 +1,94 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-md);
+}
+
+.modeSelector {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-xs);
+}
+
+.modeSelectorLabel {
+	font-size: var(--font-size-sm);
+	font-weight: var(--font-weight-semibold);
+}
+
+.fieldsGrid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--space-md);
+}
+
+.fieldLabel {
+	font-size: var(--font-size-sm);
+	font-weight: var(--font-weight-semibold);
+	margin-bottom: var(--space-xs);
+	display: block;
+}
+
+.resultBox {
+	padding: var(--space-md);
+	background: var(--panel-muted);
+	border-radius: var(--radius-md);
+	border: var(--border-width) solid var(--border);
+}
+
+.resultLabel {
+	font-size: var(--font-size-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--text-secondary);
+}
+
+.resultValue {
+	font-size: var(--font-size-lg);
+	font-weight: var(--font-weight-bold);
+	color: var(--accent);
+}
+
+.formula {
+	font-size: var(--font-size-xs);
+	color: var(--muted);
+	font-family: monospace;
+	margin-top: var(--space-sm);
+}
+
+.calculating {
+	padding: var(--space-md);
+	text-align: center;
+	color: var(--muted);
+}
+
+.modeHint {
+	padding: var(--space-sm) var(--space-md);
+	background: var(--panel-muted);
+	border-radius: var(--radius-md);
+	border: var(--border-width) solid var(--border);
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+	line-height: 1.5;
+}
+
+.requiredField {
+	position: relative;
+}
+
+.requiredMark {
+	color: var(--red);
+	font-weight: var(--font-weight-bold);
+}
+
+.fieldWarning {
+	border-color: var(--red) !important;
+	background-color: var(--panel-muted) !important;
+}
+
+.fieldHint {
+	display: block;
+	margin-top: var(--space-xs);
+	font-size: var(--font-size-xs);
+	color: var(--red);
+	font-style: italic;
+}
+

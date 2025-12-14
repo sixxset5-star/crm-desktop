@@ -1,0 +1,49 @@
+._root {
+	position: relative;
+	display: inline-block;
+	width: var(--switch-width);
+	height: var(--switch-height);
+	border-radius: var(--radius-pill);
+	background: var(--border);
+	border: var(--border-default);
+	transition: background 0.2s ease;
+	vertical-align: middle;
+	cursor: pointer;
+	box-sizing: border-box;
+	outline: none;
+}
+._root[aria-checked="true"] {
+	background: var(--accent);
+	border-color: var(--accent);
+}
+._root:hover {
+	background: color-mix(in srgb, var(--border) 90%, var(--black) 10%);
+}
+._root[aria-checked="true"]:hover {
+	background: color-mix(in srgb, var(--accent) 92%, var(--black) 8%);
+	border-color: color-mix(in srgb, var(--accent) 92%, var(--black) 8%);
+}
+._root:focus-visible {
+	outline: var(--border-default);
+	outline-offset: var(--switch-focus-offset);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, var(--white) 70%);
+}
+._thumb {
+	position: absolute;
+	top: 50%;
+	left: var(--switch-thumb-offset);
+	width: var(--switch-thumb-size);
+	height: var(--switch-thumb-size);
+	border-radius: 50%;
+	background: var(--white);
+	box-shadow: 0 2px 4px color-mix(in srgb, var(--black) 20%, transparent);
+	--x: 0px;
+	transform: translate(var(--x), -50%);
+	transition: transform 0.2s ease;
+}
+._root[aria-checked="true"] ._thumb { --x: var(--switch-thumb-translate); }
+._root:active ._thumb {
+	transform: translate(var(--x), -50%) scale(0.96);
+}
+
+

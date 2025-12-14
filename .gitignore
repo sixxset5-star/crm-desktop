@@ -1,0 +1,25 @@
+node_modules
+.DS_Store
+dist/
+release/
+*.log
+*.sql
+*.tar.gz
+*.asar
+app.asar
+Из ПАПКИ/
+backups/
+*.backup
+*.backup-*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel
+
+# Large build files (GitHub limit 100MB)
+*.dmg
+**/Electron Framework.framework/**

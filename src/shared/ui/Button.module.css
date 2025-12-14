@@ -1,0 +1,78 @@
+/* Base button */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  height: var(--control-md-height);
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  border: var(--border-width) solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+.button:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+  color: var(--text-tertiary);
+}
+
+/* Sizes */
+.xs { height: var(--control-xs-height); padding: 0 var(--space-md); font-size: var(--font-size-sm); border-radius: var(--radius-pill); }
+.sm { height: var(--control-sm-height); padding: 0 var(--space-md); font-size: var(--font-size-sm); border-radius: var(--radius-pill); }
+.md { height: var(--control-md-height); padding: 0 var(--space-md); font-size: var(--font-size-sm); }
+.lg { height: var(--control-lg-height); padding: 0 var(--space-lg); font-size: var(--font-size-md); }
+.fullWidth { width: 100%; }
+
+/* Variants */
+.primary {
+  background: var(--accent);
+  color: var(--white);
+}
+.primary:hover { 
+  background: color-mix(in srgb, var(--accent) 92%, transparent);
+}
+
+.secondary {
+  background: var(--bg);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+.secondary:hover { 
+  background: var(--panel-active);
+  border-color: var(--border-strong);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: transparent;
+}
+.ghost:hover { background: var(--panel-hover); }
+
+.danger {
+  background: var(--red);
+  color: var(--white);
+}
+.danger:hover { 
+  background: color-mix(in srgb, var(--red) 95%, transparent);
+}
+
+.action {
+  background: var(--bg);
+  color: var(--text-primary);
+  border-color: var(--border);
+  border-style: dashed;
+}
+.action:hover {
+  background: var(--accent);
+  color: var(--white);
+  border-color: var(--accent);
+}
+
+
+

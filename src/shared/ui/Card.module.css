@@ -1,0 +1,35 @@
+/* Card container using existing variables */
+.card {
+	background: var(--panel);
+	border: none;
+	border-radius: var(--radius-l);
+	box-shadow: 0 6px 20px color-mix(in srgb, var(--black) 6%, transparent);
+}
+.content {
+	padding: var(--space-lg);
+}
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--space-md) var(--space-lg);
+	border-bottom: none;
+}
+.title {
+	font-weight: 600;
+}
+.footer {
+	padding: var(--space-md) var(--space-lg);
+	border-top: none;
+}
+
+
+
+
+
+
+
+
+
+
+

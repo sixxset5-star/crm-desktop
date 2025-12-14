@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+## CRM Desktop Ground Rules
+
+- Keep `src/pages` lean: orchestrate data and route-level state there, but move UI into `src/components/**`.
+- Every new component ships with a focused story/demo (Storybook or MDX note) describing inputs/outputs.
+- Prefer composition over props drilling: compose page sections from small, pure components and lift state only when reused.
+- Name components by domain (`FinancialSummarySection`, `LeadList`, etc.) and colocate their hooks/styles inside the same folder.
+- When touching shared components, document breaking changes in `docs/changelog.md` and ping feature owners.
+- Tests: hooks/components get RTL tests for branching logic; visual-only pieces at least snapshot + accessibility check.
+- Styling: use the design tokens helper; no ad-hoc hex values inside components unless token missing (then file a TODO).
+- Любые повторяющиеся элементы выносим в параметризованные компоненты: без дублирования разметки, все отличия передаются через пропсы.

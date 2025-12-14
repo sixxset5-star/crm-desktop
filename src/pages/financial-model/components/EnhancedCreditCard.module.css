@@ -1,0 +1,146 @@
+.card {
+	padding: var(--space-md);
+	background: var(--panel);
+	border: var(--border-width) solid var(--border);
+	border-radius: var(--radius-md);
+	transition: var(--transition-base);
+}
+
+.card:hover {
+	border-color: var(--border-strong);
+}
+
+.card.archived {
+	opacity: var(--opacity-disabled);
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: start;
+	gap: var(--space-md);
+	margin-bottom: var(--space-md);
+}
+
+.titleSection {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: var(--space-sm);
+}
+
+.title {
+	margin: 0;
+	font-size: var(--font-size-lg);
+	font-weight: var(--font-weight-semibold);
+	color: var(--text);
+}
+
+.archiveBadge {
+	font-size: var(--font-size-xs);
+	font-weight: var(--font-weight-semibold);
+	color: var(--muted);
+	background: var(--panel-muted);
+	padding: var(--space-xs) var(--space-sm);
+	border-radius: var(--radius-md);
+}
+
+.actions {
+	display: flex;
+	gap: var(--space-xs);
+	align-items: center;
+}
+
+.scheduleButton {
+	padding: var(--space-xs) var(--space-sm);
+	font-size: var(--font-size-sm);
+	background: var(--panel);
+	border: var(--border-default);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	color: var(--text);
+	transition: var(--transition-base);
+}
+
+.scheduleButton:hover {
+	background: var(--panel-hover);
+}
+
+.fieldsGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: var(--space-md);
+	margin-bottom: var(--space-md);
+}
+
+.scheduleInfo {
+	margin-top: var(--space-md);
+	padding-top: var(--space-md);
+	border-top: var(--border-default);
+}
+
+.scheduleProgress {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-xs);
+	margin-bottom: var(--space-sm);
+}
+
+.scheduleLabel {
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+.progressBar {
+	width: 100%;
+	height: 8px;
+	background: var(--bg);
+	border-radius: var(--radius-md);
+	overflow: hidden;
+}
+
+.progressFill {
+	height: 100%;
+	background: var(--green);
+	transition: width var(--transition-base);
+}
+
+.nextPayment {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: var(--space-sm);
+	padding: var(--space-sm);
+	background: var(--panel-muted);
+	border-radius: var(--radius-md);
+}
+
+.nextPaymentLabel {
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+.nextPaymentValue {
+	font-size: var(--font-size-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--accent);
+}
+
+.description {
+	margin-top: var(--space-md);
+	padding: var(--space-sm);
+	background: var(--bg);
+	border-radius: var(--radius-md);
+	font-size: var(--font-size-sm);
+	color: var(--text);
+}
+
+.notes {
+	margin-top: var(--space-sm);
+	padding: var(--space-sm);
+	background: var(--bg);
+	border-radius: var(--radius-md);
+	font-size: var(--font-size-sm);
+	color: var(--muted);
+}
+

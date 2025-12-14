@@ -1,0 +1,254 @@
+:root {
+	/* Palette */
+	--bg: #f7f7f4;
+	--page-bg: #f7f7f4;
+	--panel: #ffffff;
+	--panel-muted: #f2efe7;
+	--text: #14120b;
+	--muted: #6f665a;
+	--white: #ffffff;
+	--black: #000000;
+	--brand: #14120b;
+	--accent: #14120b;
+	--accent-soft: #2b2319;
+	--accent-contrast: #f3ece1;
+	--warning: #b8843c;
+	--info: #8a7762;
+	--neutral-soft: #cbd5e1;
+	--border: #e4dfd4;
+	--border-strong: #d7d0c4;
+	--border-light: #f0ede6;
+	--border-width: 1px;
+	--green: #0f9d58;
+	--green-active: #14AE5C;
+	--red: #c73c32;
+
+	/* Text levels */
+	--text-primary: var(--text);
+	--text-secondary: var(--muted);
+	--text-tertiary: color-mix(in srgb, var(--muted) 70%, transparent);
+	--text-low: color-mix(in srgb, var(--text) 50%, transparent);
+
+	/* Panel states */
+	--panel-hover: var(--bg);
+	--panel-active: var(--panel-muted);
+	--panel-selected: var(--panel-muted);
+
+	/* Radii scale */
+	--radius-s: 12px;
+	--radius-sm: 8px;
+	--radius-m: 14px;
+	--radius-md: 8px;
+	--radius-l: 16px;
+	--radius-lg: 24px;
+	--radius-xl: 20px;
+	--radius-pill: 999px;
+
+	/* Spacing scale */
+	--space-none: 0;
+	--space-xs: 4px;
+	--space-sm: 8px;
+	--space-md: 16px;
+	--space-lg: 24px;
+	--space-xl: 40px;
+	--space-xxl: 64px;
+
+	/* Surfaces */
+	--surface-bg: var(--panel);
+	--surface-border-color: color-mix(in srgb, var(--text) 8%, transparent);
+	--surface-border: var(--border-width) solid var(--surface-border-color);
+	--surface-radius: var(--radius-l);
+	--surface-padding: var(--space-lg);
+	--surface-shadow: 0 25px 60px color-mix(in srgb, var(--text) 8%, transparent);
+
+	/* Motion */
+	--transition-base: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-smooth: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+	--transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+	/* Typography */
+	--font-size-xs: 11px;
+	--font-size-sm: 13px;
+	--font-size-md: 15px;
+	--font-size-lg: 18px;
+	--font-size-xl: 22px;
+	--font-size-2xl: 28px;
+	--line-height-tight: 1.1;
+	--line-height-base: 1.45;
+	--line-height-relaxed: 1.7;
+	--font-weight-normal: 400;
+	--font-weight-medium: 500;
+	--font-weight-semibold: 600;
+	--font-weight-bold: 700;
+
+	/* Shadows */
+	--shadow-sm: 0 4px 16px color-mix(in srgb, var(--text) 6%, transparent);
+	--shadow-md: 0 18px 40px color-mix(in srgb, var(--text) 8%, transparent);
+	--shadow-lg: 0 32px 90px color-mix(in srgb, var(--text) 12%, transparent);
+	--text-shadow-sm: 0 1px 2px color-mix(in srgb, var(--black) 20%, transparent);
+
+	/* Control sizes */
+	--control-xs-height: 28px;
+	--control-sm-height: 32px;
+	--control-md-height: 36px;
+	--control-lg-height: 42px;
+	--control-xl-height: 44px;
+
+	/* Icon sizes */
+	--icon-size-xs: 11px;
+	--icon-size-sm: 16px;
+	--icon-size-md: 20px;
+	--icon-size-lg: 24px;
+	--icon-size-xl: 32px;
+	--icon-stroke-width: 2;
+
+	/* Layout */
+	--layout-max-width: 1100px;
+	--modal-width: 400px;
+	--modal-width-lg: 700px;
+
+	/* Reports page specific sizes */
+	--reports-month-label-min-width: 180px;
+	--reports-task-count-min-width: 140px;
+	--reports-modal-max-height: 420px;
+	--reports-metrics-grid-columns: 2;
+
+	/* Calculator page specific sizes */
+	--calculator-input-coefficient-width: 70px;
+
+	/* Taxes page specific sizes */
+	--taxes-select-min-width: 300px;
+
+	/* Archive page specific sizes */
+	--archive-select-min-width: 180px;
+	--archive-card-grid-min-width: 300px;
+
+	/* Timing */
+	--delay-short: 200ms;
+	--delay-medium: 300ms;
+	--delay-long: 500ms;
+
+	/* Z-index scale */
+	--z-index-base: 0;
+	--z-index-dropdown: 1000;
+	--z-index-modal: 1001;
+	--z-index-popover: 1010;
+	--z-index-tooltip: 1020;
+
+	/* Opacity */
+	--opacity-disabled: 0.6;
+	--opacity-hover: 0.8;
+	--opacity-subtle: 0.85;
+	--opacity-inactive: 0.5;
+	--opacity-full: 1;
+
+	/* Notification */
+	--notification-timeout: 5000ms;
+	--notification-position-offset: 20px;
+	--notification-max-width: 400px;
+
+	/* Chart */
+	--chart-height: 300px;
+	--chart-axis-width: 50px;
+	--chart-bar-gap: 2px;
+	--chart-date-label-height: 20px;
+	--chart-grid-line-opacity: 0.3;
+	--chart-zero-line-opacity: 1;
+	--chart-bar-opacity-default: 0.8;
+	--chart-bar-opacity-empty: 0.3;
+	--chart-bar-opacity-hovered: 1;
+	--chart-bar-min-height: 2px;
+	--chart-bar-hover-scale: 1.05;
+	--chart-bar-hover-shadow: 0 4px 8px color-mix(in srgb, var(--black) 15%, transparent);
+	--chart-bar-transition: all 0.2s;
+	--chart-indicator-size: 20px;
+	--chart-indicator-border-width: 2px;
+	--chart-indicator-hover-scale: 1.2;
+	--chart-indicator-compensation-factor: 0.05;
+	--chart-legend-indicator-size: 14px;
+	--chart-legend-indicator-radius: 3px;
+	--notification-padding: 12px 16px;
+	--notification-gap: 12px;
+	--notification-close-font-size: 20px;
+	--notification-close-opacity: 0.8;
+	--notification-z-index: 10000;
+
+	/* Modal defaults */
+	--modal-default-width: 560px;
+
+	/* Avatar sizes */
+	--avatar-size-sm: 24px;
+	--avatar-size-md: 48px;
+	--avatar-size-lg: 64px;
+	--avatar-size-xl: 120px;
+	--avatar-size-chip: 18px;
+
+	/* Input sizes */
+	--input-checkbox-size: 18px;
+	--input-select-icon-size: 12px;
+	--input-select-icon-offset: 14px;
+	--input-select-padding-right: 32px;
+	--input-focus-offset: 2px;
+	--input-textarea-min-height: 100px;
+
+	/* Chip sizes */
+	--chip-gap: 6px;
+	--chip-padding-y: var(--space-xs);
+	--chip-padding-x: 10px;
+
+	/* Progress bar sizes */
+	--progress-bar-height: 8px;
+	--progress-label-offset: -18px;
+
+	/* Switch sizes */
+	--switch-width: 44px;
+	--switch-height: 24px;
+	--switch-thumb-size: 20px;
+	--switch-thumb-offset: 2px;
+	--switch-thumb-translate: 18px;
+	--switch-focus-offset: 2px;
+
+	/* Customer page specific */
+	--customer-form-modal-max-width: 480px;
+	--customer-contact-select-min-width: 140px;
+	--customer-contact-select-max-width: 180px;
+	--customer-grid-min-column-width: 300px;
+	--customer-empty-state-padding: 48px;
+
+	/* Border defaults */
+	--border-default: var(--border-width) solid var(--border);
+	--border-default-strong: var(--border-width) solid var(--border-strong);
+	--border-top-default: var(--border-width) solid var(--border);
+	--border-bottom-default: var(--border-width) solid var(--border);
+
+	/* Holiday emoji positions (positive values, function will add minus for negative offsets) */
+	--holiday-emoji-offset-top-small: 8px;
+	--holiday-emoji-offset-top-medium: 10px;
+	--holiday-emoji-offset-top-large: 12px;
+	--holiday-emoji-offset-left-small: 5px;
+	--holiday-emoji-offset-left-medium: 8px;
+	--holiday-emoji-offset-bottom-small: 8px;
+	--holiday-emoji-offset-bottom-medium: 10px;
+	--holiday-emoji-offset-bottom-large: 12px;
+	--holiday-emoji-offset-right-small: 5px;
+	--holiday-emoji-offset-right-medium: 8px;
+	--holiday-emoji-offset-left-positive-small: 5px;
+	--holiday-emoji-offset-left-positive-medium: 8px;
+	--holiday-emoji-offset-left-positive-large: 10px;
+	--holiday-emoji-offset-right-positive-small: 8px;
+	--holiday-emoji-offset-right-positive-medium: 10px;
+
+	/* Payment tax field width */
+	--payment-tax-field-width: 90px;
+
+	/* Expenses grid columns */
+	--expenses-grid-columns: 1fr 140px 160px auto;
+	--expense-col-amount: 120px;
+	--expense-col-date: 140px;
+	--expense-col-contractor: 160px;
+}
+
+
+
+
+
