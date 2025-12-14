@@ -100,7 +100,7 @@ type SettingsState = {
 	isLoading: boolean;
 	hasLoaded: boolean;
 	updateSettings: (updates: Partial<Settings>) => void;
-	loadFromDisk: () => Promise<void>;
+	loadFromDisk: (force?: boolean) => Promise<void>;
 };
 
 // Промис текущей загрузки для предотвращения дублирования параллельных вызовов
@@ -127,16 +127,22 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 			return { settings: newSettings };
 		});
 	},
-	loadFromDisk: async () => {
+	loadFromDisk: async (force = false) => {
 		const state = get();
 		
-		// Предотвращаем дублирование загрузки
-		if (loadPromise) {
+		// Предотвращаем дублирование загрузки (если не force)
+		if (loadPromise && !force) {
 			return loadPromise;
 		}
 		
-		if (state.isLoading || state.hasLoaded) {
+		if ((state.isLoading || state.hasLoaded) && !force) {
 			return;
+		}
+		
+		// Если force, сбрасываем флаг загрузки
+		if (force) {
+			log.debug('Force reloading settings');
+			set({ hasLoaded: false });
 		}
 		
 		// Создаем промис загрузки
@@ -154,8 +160,19 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 						merged.priorityColors.low = LOW_PRIORITY_NEUTRAL;
 					}
 					
+					// Логируем для отладки
+					log.debug('Settings loaded into store', {
+						hasHolidays: !!merged.holidays,
+						holidaysCount: merged.holidays?.length || 0,
+						hasCustomWeekends: !!merged.customWeekends,
+						customWeekendsCount: merged.customWeekends?.length || 0,
+						hasExcludedWeekends: !!merged.excludedWeekends,
+						excludedWeekendsCount: merged.excludedWeekends?.length || 0,
+					});
+					
 					set({ settings: merged, hasLoaded: true });
 				} else {
+					log.warn('No settings loaded, using defaults');
 					set({ settings: defaults, hasLoaded: true });
 				}
 			} catch (error) {

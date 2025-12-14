@@ -452,6 +452,7 @@ export async function loadSettings(): Promise<Settings | null> {
     if (error) {
       // Если записи нет - это нормально (первый запуск)
       if (error.code === 'PGRST116') {
+        log.debug('Settings record with key="main" not found (first launch)');
         return null;
       }
       log.error('Failed to load settings', error);
@@ -459,6 +460,7 @@ export async function loadSettings(): Promise<Settings | null> {
     }
 
     if (!data || !data.value) {
+      log.warn('Settings record found but value is empty');
       return null;
     }
 
@@ -467,8 +469,21 @@ export async function loadSettings(): Promise<Settings | null> {
     let settings: Settings;
     try {
       settings = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+      
+      // Логируем для отладки
+      log.debug('Settings loaded', {
+        hasHolidays: !!settings.holidays,
+        holidaysCount: settings.holidays?.length || 0,
+        hasCustomWeekends: !!settings.customWeekends,
+        customWeekendsCount: settings.customWeekends?.length || 0,
+        hasExcludedWeekends: !!settings.excludedWeekends,
+        excludedWeekendsCount: settings.excludedWeekends?.length || 0,
+      });
     } catch (parseError) {
-      log.error('Failed to parse settings value', parseError);
+      log.error('Failed to parse settings value', parseError, {
+        valueType: typeof data.value,
+        valuePreview: typeof data.value === 'string' ? data.value.substring(0, 100) : String(data.value).substring(0, 100),
+      });
       return null;
     }
 

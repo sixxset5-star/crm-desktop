@@ -24,6 +24,11 @@ elif [ "$MIGRATION_TYPE" = "delete-old-settings" ]; then
   echo "📁 Текущая директория: $(pwd)"
   echo ""
   node scripts/delete-all-old-settings.mjs
+elif [ "$MIGRATION_TYPE" = "force-delete-settings" ]; then
+  echo "🗑️  Принудительное удаление старых записей настроек..."
+  echo "📁 Текущая директория: $(pwd)"
+  echo ""
+  node scripts/force-delete-old-settings.mjs
 else
   echo "🚀 Запуск миграции данных из SQLite в Supabase..."
   echo "📁 Текущая директория: $(pwd)"
