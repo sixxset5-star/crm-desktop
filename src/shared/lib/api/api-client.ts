@@ -29,7 +29,43 @@ export async function loadTasks(): Promise<Task[]> {
       return [];
     }
 
-    return data || [];
+    if (!data) return [];
+
+    // Преобразуем snake_case в camelCase
+    return data.map((row: any) => ({
+      ...row,
+      paidAmount: row.paid_amount,
+      expensesEntries: row.expenses_entries ? (typeof row.expenses_entries === 'string' ? JSON.parse(row.expenses_entries) : row.expenses_entries) : [],
+      pausedRanges: row.paused_ranges ? (typeof row.paused_ranges === 'string' ? JSON.parse(row.paused_ranges) : row.paused_ranges) : [],
+      taxRate: row.tax_rate,
+      startDate: row.start_date,
+      subtasks: row.subtasks ? (typeof row.subtasks === 'string' ? JSON.parse(row.subtasks) : row.subtasks) : [],
+      tags: row.tags ? (typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags) : [],
+      customerId: row.customer_id,
+      links: row.links ? (typeof row.links === 'string' ? JSON.parse(row.links) : row.links) : [],
+      files: row.files ? (typeof row.files === 'string' ? JSON.parse(row.files) : row.files) : [],
+      calculatorQuantity: row.calculator_quantity,
+      calculatorPricePerUnit: row.calculator_price_per_unit,
+      accesses: row.accesses ? (typeof row.accesses === 'string' ? JSON.parse(row.accesses) : row.accesses) : [],
+      columnId: row.column_id,
+      pausedFromColumnId: row.paused_from_column_id,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      payments: row.payments ? (typeof row.payments === 'string' ? JSON.parse(row.payments) : row.payments) : [],
+      // Удаляем snake_case поля
+      paid_amount: undefined,
+      expenses_entries: undefined,
+      paused_ranges: undefined,
+      tax_rate: undefined,
+      start_date: undefined,
+      customer_id: undefined,
+      calculator_quantity: undefined,
+      calculator_price_per_unit: undefined,
+      paused_from_column_id: undefined,
+      created_at: undefined,
+      updated_at: undefined,
+      column_id: undefined,
+    }));
   } catch (error) {
     log.error('Error loading tasks', error);
     return [];
@@ -43,10 +79,39 @@ export async function saveTasks(tasks: Task[]): Promise<void> {
       return;
     }
 
+    // Преобразуем camelCase в snake_case для Supabase
+    const dbTasks = tasks.map((task: any) => ({
+      id: task.id,
+      title: task.title,
+      amount: task.amount ?? null,
+      expenses: task.expenses ?? null,
+      paid_amount: task.paidAmount ?? null,
+      payments: task.payments ? (typeof task.payments === 'string' ? task.payments : JSON.stringify(task.payments)) : null,
+      expenses_entries: task.expensesEntries ? (typeof task.expensesEntries === 'string' ? task.expensesEntries : JSON.stringify(task.expensesEntries)) : null,
+      paused_ranges: task.pausedRanges ? (typeof task.pausedRanges === 'string' ? task.pausedRanges : JSON.stringify(task.pausedRanges)) : null,
+      tax_rate: task.taxRate ?? null,
+      start_date: task.startDate ?? null,
+      deadline: task.deadline ?? null,
+      subtasks: task.subtasks ? (typeof task.subtasks === 'string' ? task.subtasks : JSON.stringify(task.subtasks)) : null,
+      tags: task.tags ? (typeof task.tags === 'string' ? task.tags : JSON.stringify(task.tags)) : null,
+      notes: task.notes ?? null,
+      customer_id: task.customerId ?? null,
+      links: task.links ? (typeof task.links === 'string' ? task.links : JSON.stringify(task.links)) : null,
+      files: task.files ? (typeof task.files === 'string' ? task.files : JSON.stringify(task.files)) : null,
+      calculator_quantity: task.calculatorQuantity ?? null,
+      calculator_price_per_unit: task.calculatorPricePerUnit ?? null,
+      priority: task.priority ?? null,
+      accesses: task.accesses ? (typeof task.accesses === 'string' ? task.accesses : JSON.stringify(task.accesses)) : null,
+      column_id: task.columnId ?? 'unprocessed',
+      paused_from_column_id: task.pausedFromColumnId ?? null,
+      created_at: task.createdAt ?? null,
+      updated_at: task.updatedAt ?? null,
+    }));
+
     // Upsert все задачи (обновить существующие, создать новые)
     const { error } = await supabase
       .from('tasks')
-      .upsert(tasks, { onConflict: 'id' });
+      .upsert(dbTasks, { onConflict: 'id' });
 
     if (error) {
       log.error('Failed to save tasks', error);
@@ -374,10 +439,14 @@ export async function loadSettings(): Promise<Settings | null> {
     }
 
     // Преобразуем массив записей в объект Settings
+    // В Supabase value уже JSONB (объект), не нужно парсить
     const settings: Partial<Settings> = {};
     for (const row of data) {
       try {
-        settings[row.key as keyof Settings] = JSON.parse(row.value);
+        // В Supabase JSONB уже парсится автоматически
+        // Если это строка - парсим, если объект - используем как есть
+        const value = typeof row.value === 'string' ? JSON.parse(row.value) : row.value;
+        settings[row.key as keyof Settings] = value;
       } catch (parseError) {
         log.warn(`Failed to parse setting ${row.key}`, parseError);
       }
@@ -393,9 +462,10 @@ export async function loadSettings(): Promise<Settings | null> {
 export async function saveSettings(settings: Settings): Promise<void> {
   try {
     // Преобразуем объект Settings в массив записей
+    // В Supabase JSONB поле - передаем объект напрямую (Supabase сам сериализует)
     const settingsArray = Object.entries(settings).map(([key, value]) => ({
       key,
-      value: JSON.stringify(value),
+      value: value, // JSONB автоматически сериализует объекты
     }));
 
     const { error } = await supabase.from('settings').upsert(settingsArray, { onConflict: 'key' });
