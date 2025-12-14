@@ -151,11 +151,28 @@ export function preserveCriticalFields(
  * // Критические поля из loadedFromDisk будут сохранены, даже если они пустые
  */
 export function mergeWithDefaults(defaults: Settings, loaded: Partial<Settings>): Settings {
-	const merged = { ...defaults, ...loaded };
+	const merged = { ...defaults };
 
-	// Explicitly preserve critical fields from loaded data (even if undefined/empty)
+	// Сначала мерджим обычные поля
+	for (const key in loaded) {
+		if (!(key in loaded)) continue;
+		const value = loaded[key as keyof Settings];
+		const settingsKey = key as keyof Settings;
+		
+		// Критические поля обрабатываем отдельно
+		if (!isCriticalField(key)) {
+			if (value !== undefined) {
+				merged[settingsKey] = value as Settings[typeof settingsKey];
+			}
+		}
+	}
+
+	// КРИТИЧНО: Сохраняем критические поля из loaded, даже если они undefined/пустые
+	// Это важно для явного "очищения" полей
 	for (const field of CRITICAL_FIELDS) {
 		if (field in loaded) {
+			// Присваиваем значение даже если оно undefined/пустое
+			// Это позволяет явно очистить поля
 			merged[field] = loaded[field] as Settings[typeof field];
 		}
 	}

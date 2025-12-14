@@ -152,6 +152,16 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 				const loaded = await loadSettings();
 				
 				if (loaded && typeof loaded === 'object') {
+					// Логируем что пришло ДО мерджа
+					log.debug('Settings loaded from disk (BEFORE merge)', {
+						hasHolidays: !!loaded.holidays,
+						holidaysCount: loaded.holidays?.length || 0,
+						hasCustomWeekends: !!loaded.customWeekends,
+						customWeekendsCount: loaded.customWeekends?.length || 0,
+						hasExcludedWeekends: !!loaded.excludedWeekends,
+						excludedWeekendsCount: loaded.excludedWeekends?.length || 0,
+					});
+					
 					// Merge loaded settings with defaults
 					const merged = mergeWithDefaults(defaults, loaded);
 					
@@ -160,14 +170,15 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 						merged.priorityColors.low = LOW_PRIORITY_NEUTRAL;
 					}
 					
-					// Логируем для отладки
-					log.debug('Settings loaded into store', {
+					// Логируем что получилось ПОСЛЕ мерджа
+					log.debug('Settings loaded into store (AFTER merge)', {
 						hasHolidays: !!merged.holidays,
 						holidaysCount: merged.holidays?.length || 0,
 						hasCustomWeekends: !!merged.customWeekends,
 						customWeekendsCount: merged.customWeekends?.length || 0,
 						hasExcludedWeekends: !!merged.excludedWeekends,
 						excludedWeekendsCount: merged.excludedWeekends?.length || 0,
+						holidaysArray: merged.holidays?.slice(0, 3), // Первые 3 для проверки
 					});
 					
 					set({ settings: merged, hasLoaded: true });
