@@ -718,7 +718,40 @@ export async function saveExtraWorkToDisk(extraWorks: ExtraWork[]): Promise<void
 }
 
 export async function selectAvatarFile(): Promise<string | null> {
-	if (!window.crm) return null;
+	// В браузере используем Supabase Storage
+	if (!window.crm) {
+		const { uploadAvatar } = await import('./api/storage-client');
+		
+		// Создаем input элемент для выбора файла
+		return new Promise((resolve) => {
+			const input = document.createElement('input');
+			input.type = 'file';
+			input.accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp';
+			input.onchange = async (e) => {
+				const file = (e.target as HTMLInputElement).files?.[0];
+				if (!file) {
+					resolve(null);
+					return;
+				}
+				
+				// Генерируем уникальное имя файла
+				const timestamp = Date.now();
+				const ext = file.name.split('.').pop() || 'jpg';
+				const fileName = `avatar_${timestamp}.${ext}`;
+				
+				// Загружаем в Supabase Storage
+				const url = await uploadAvatar(file, fileName);
+				
+				// Возвращаем URL (или сохраняем имя файла для совместимости с crm://)
+				// Для обратной совместимости сохраняем как crm://, но с полным URL в базе
+				resolve(url || `crm://${fileName}`);
+			};
+			input.oncancel = () => resolve(null);
+			input.click();
+		});
+	}
+	
+	// В Electron используем IPC
 	try {
 		return await window.crm.selectAvatar();
 	} catch {
