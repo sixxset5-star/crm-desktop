@@ -4,8 +4,10 @@ dist/
 release/
 *.log
 *.tar.gz
-# Allow SQL migrations
-!supabase/migrations/*.sql
+# Allow SQL migrations (must come before *.sql rule)
+!supabase/
+!supabase/**/*.sql
+*.sql
 *.asar
 app.asar
 Из ПАПКИ/

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { saveContractors, loadContractors } from '@/shared/lib/data-source';
-import { deactivateContractorOnDisk, deleteContractorOnDisk } from '@/shared/lib/electron-bridge';
+import { saveContractors, loadContractors, deactivateContractor, deleteContractor } from '@/shared/lib/data-source';
 import type { Contractor } from '@/types';
 import { createLogger } from '@/shared/lib/logger';
 import { generateShortId } from '@/shared/utils/id';
@@ -82,8 +81,8 @@ export const useContractorsStore = create<ContractorState>((set, get) => ({
 			return 0;
 		}
 		
-		// Вызываем IPC для деактивации (это обновит задачи и запишет историю)
-		const tasksReturned = await deactivateContractorOnDisk(id);
+		// Вызываем функцию для деактивации (работает и в Electron, и в браузере)
+		const tasksReturned = await deactivateContractor(id);
 		
 		// Обновляем локальное состояние
 		set((s) => ({ 
@@ -94,7 +93,7 @@ export const useContractorsStore = create<ContractorState>((set, get) => ({
 		
 		// Сохраняем обновленное состояние
 		const updatedContractors = get().contractors;
-		void saveContractorsToDisk(updatedContractors);
+		void saveContractors(updatedContractors);
 		
 		return tasksReturned;
 	},
@@ -106,7 +105,7 @@ export const useContractorsStore = create<ContractorState>((set, get) => ({
 		}
 		
 		// Вызываем IPC для удаления (проверка на задачи происходит на бэкенде)
-		await deleteContractorOnDisk(id);
+		await deleteContractor(id);
 		
 		// Удаляем из локального состояния
 		set((s) => ({ 
@@ -115,7 +114,7 @@ export const useContractorsStore = create<ContractorState>((set, get) => ({
 		
 		// Сохраняем обновленное состояние
 		const updatedContractors = get().contractors;
-		void saveContractorsToDisk(updatedContractors);
+		void saveContractors(updatedContractors);
 	},
 	loadFromDisk: async () => {
 		// Всегда загружаем при вызове

@@ -155,6 +155,59 @@ export async function deleteCredit(id: string): Promise<void> {
   }
 }
 
+// Вспомогательные функции для кредитов (пока только для Electron)
+// В будущем можно добавить реализацию для браузера, если нужно
+export async function rebuildCreditSchedule(params: {
+  creditId: string;
+  newParams: {
+    scheduleType?: 'annuity' | 'differentiated';
+    amount?: number;
+    annualRate?: number;
+    termMonths?: number;
+    startDate?: string;
+    paymentDay?: number;
+  };
+}): Promise<Credit & { schedule: CreditScheduleItem[] }> {
+  if (isElectron()) {
+    const { rebuildCreditSchedule: rebuild } = await import('./electron-bridge');
+    return await rebuild(params);
+  } else {
+    // В браузере пока не поддерживается - нужно пересчитать на клиенте
+    throw new Error('rebuildCreditSchedule not yet supported in browser. Please use Electron app.');
+  }
+}
+
+export async function applyCreditPayment(params: {
+  creditId: string;
+  itemId: string;
+  paidAmount?: number;
+}): Promise<Credit & { schedule: CreditScheduleItem[] }> {
+  if (isElectron()) {
+    const { applyCreditPayment: applyPayment } = await import('./electron-bridge');
+    return await applyPayment(params);
+  } else {
+    // В браузере нужно обновить график через API
+    throw new Error('applyCreditPayment not yet supported in browser. Please use Electron app.');
+  }
+}
+
+export async function buildCreditSchedule(params: {
+  scheduleType: 'annuity' | 'differentiated';
+  amount: number;
+  annualRate: number;
+  termMonths: number;
+  startDate: string;
+  paymentDay?: number;
+}): Promise<CreditScheduleItem[]> {
+  if (isElectron()) {
+    const { buildCreditSchedule: buildSchedule } = await import('./electron-bridge');
+    return await buildSchedule(params);
+  } else {
+    // В браузере пока не поддерживается - нужно пересчитать на клиенте
+    throw new Error('buildCreditSchedule not yet supported in browser. Please use Electron app.');
+  }
+}
+
 // ==================== Incomes ====================
 
 export async function loadIncomes(): Promise<Income[]> {
@@ -242,5 +295,40 @@ export async function saveExtraWork(extraWork: ExtraWork[]): Promise<void> {
     return await saveExtraWorkToDisk(extraWork);
   } else {
     return await apiClient.saveExtraWork(extraWork);
+  }
+}
+
+// ==================== Contractors (helpers) ====================
+
+export async function deactivateContractor(id: string): Promise<number> {
+  if (isElectron()) {
+    const { deactivateContractorOnDisk } = await import('./electron-bridge');
+    return await deactivateContractorOnDisk(id);
+  } else {
+    // В браузере обновляем через API
+    const { loadContractors, saveContractors } = await import('./api/api-client');
+    const contractors = await loadContractors();
+    const contractor = contractors.find(c => c.id === id);
+    if (contractor) {
+      const updated = contractors.map(c => 
+        c.id === id ? { ...c, active: 0 } : c
+      );
+      await saveContractors(updated);
+      return 1;
+    }
+    return 0;
+  }
+}
+
+export async function deleteContractor(id: string): Promise<void> {
+  if (isElectron()) {
+    const { deleteContractorOnDisk } = await import('./electron-bridge');
+    return await deleteContractorOnDisk(id);
+  } else {
+    // В браузере удаляем через API
+    const { loadContractors, saveContractors } = await import('./api/api-client');
+    const contractors = await loadContractors();
+    const updated = contractors.filter(c => c.id !== id);
+    await saveContractors(updated);
   }
 }

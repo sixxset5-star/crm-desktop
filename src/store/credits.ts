@@ -13,7 +13,7 @@ import {
 	rebuildCreditSchedule,
 	applyCreditPayment as applyCreditPaymentBridge,
 	buildCreditSchedule as buildCreditScheduleBridge,
-} from '@/shared/lib/electron-bridge';
+} from '@/shared/lib/data-source';
 import { createLogger } from '@/shared/lib/logger';
 
 const log = createLogger('Credits');
