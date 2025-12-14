@@ -78,18 +78,21 @@ async function migrateTasks() {
     return;
   }
 
-  // Преобразуем JSON поля
-  const tasksToMigrate = tasks.map(task => ({
-    ...task,
-    payments: parseJSON(task.payments),
-    expenses_entries: parseJSON(task.expenses_entries),
-    paused_ranges: parseJSON(task.paused_ranges),
-    subtasks: parseJSON(task.subtasks),
-    tags: parseJSON(task.tags),
-    links: parseJSON(task.links),
-    files: parseJSON(task.files),
-    accesses: parseJSON(task.accesses),
-  }));
+  // Преобразуем JSON поля и исключаем колонки, которых нет в схеме Supabase
+  const tasksToMigrate = tasks.map(task => {
+    const { contractor_id, ...taskWithoutContractorId } = task; // Удаляем contractor_id
+    return {
+      ...taskWithoutContractorId,
+      payments: parseJSON(task.payments),
+      expenses_entries: parseJSON(task.expenses_entries),
+      paused_ranges: parseJSON(task.paused_ranges),
+      subtasks: parseJSON(task.subtasks),
+      tags: parseJSON(task.tags),
+      links: parseJSON(task.links),
+      files: parseJSON(task.files),
+      accesses: parseJSON(task.accesses),
+    };
+  });
 
   const { error } = await supabase.from('tasks').upsert(tasksToMigrate, { onConflict: 'id' });
   
@@ -135,12 +138,16 @@ async function migrateContractors() {
     return;
   }
 
-  const contractorsToMigrate = contractors.map(contractor => ({
-    ...contractor,
-    contacts: parseJSON(contractor.contacts),
-    accesses: parseJSON(contractor.accesses),
-    active: contractor.active ?? 1, // По умолчанию активен
-  }));
+  // Исключаем колонки, которых нет в схеме Supabase
+  const contractorsToMigrate = contractors.map(contractor => {
+    const { created_at, updated_at, ...contractorWithoutDates } = contractor; // Удаляем created_at и updated_at
+    return {
+      ...contractorWithoutDates,
+      contacts: parseJSON(contractor.contacts),
+      accesses: parseJSON(contractor.accesses),
+      active: contractor.active ?? 1, // По умолчанию активен
+    };
+  });
 
   const { error } = await supabase.from('contractors').upsert(contractorsToMigrate, { onConflict: 'id' });
   
