@@ -65,17 +65,33 @@ console.log('🚀 Начинаем миграцию аватаров...\n');
 async function uploadAvatarToStorage(filePath, fileName) {
   try {
     const fileBuffer = fs.readFileSync(filePath);
-    const fileBlob = new Blob([fileBuffer]);
-    const file = new File([fileBlob], fileName, { type: 'image/jpeg' });
+    
+    // Определяем MIME тип по расширению
+    const ext = path.extname(fileName).toLowerCase();
+    const mimeTypes = {
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.png': 'image/png',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.bmp': 'image/bmp',
+    };
+    const contentType = mimeTypes[ext] || 'image/jpeg';
 
     const { data, error } = await supabase.storage
       .from('avatars')
-      .upload(fileName, file, {
+      .upload(fileName, fileBuffer, {
+        contentType,
         cacheControl: '3600',
         upsert: true, // Заменяем существующий файл
       });
 
     if (error) {
+      // Если файл уже существует - это нормально (upsert должен был обработать)
+      if (error.message?.includes('already exists') || error.message?.includes('duplicate')) {
+        console.log(`   ℹ️  ${fileName} уже существует в Storage`);
+        return true;
+      }
       console.error(`   ❌ Ошибка загрузки ${fileName}:`, error.message);
       return false;
     }
