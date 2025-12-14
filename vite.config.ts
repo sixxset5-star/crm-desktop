@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: './', // Используем относительные пути для Electron
+  base: process.env.VERCEL ? '/' : './', // Абсолютный путь для веб, относительный для Electron
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
