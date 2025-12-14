@@ -480,14 +480,14 @@ export async function loadSettings(): Promise<Settings | null> {
 
 export async function saveSettings(settings: Settings): Promise<void> {
   try {
-    // Преобразуем объект Settings в массив записей
-    // В Supabase JSONB поле - передаем объект напрямую (Supabase сам сериализует)
-    const settingsArray = Object.entries(settings).map(([key, value]) => ({
-      key,
-      value: value, // JSONB автоматически сериализует объекты
-    }));
-
-    const { error } = await supabase.from('settings').upsert(settingsArray, { onConflict: 'key' });
+    // В SQLite настройки хранятся как одна запись с key='main'
+    // Сохраняем весь объект Settings как одно значение
+    const { error } = await supabase
+      .from('settings')
+      .upsert({
+        key: 'main',
+        value: settings, // JSONB автоматически сериализует объекты
+      }, { onConflict: 'key' });
 
     if (error) {
       log.error('Failed to save settings', error);
