@@ -4,24 +4,33 @@
 
 ## Обзор проекта
 
-**CRM Desktop** — это десктопное приложение на Electron для управления задачами, клиентами и финансами. Приложение использует React + TypeScript для UI и SQLite для хранения данных.
+**CRM Desktop** — это кроссплатформенное приложение для управления задачами, клиентами и финансами. Приложение поддерживает два режима работы:
+
+1. **Desktop режим** (Electron) — десктопное приложение с локальной SQLite базой данных
+2. **Web режим** (браузер) — веб-версия с облачной базой данных Supabase
+
+Приложение использует React + TypeScript для UI и автоматически переключается между локальным (SQLite) и облачным (Supabase) хранилищем в зависимости от окружения.
 
 ## Технологический стек
 
 - **Frontend**: React 18 + TypeScript
-- **Backend**: Electron 30
+- **Desktop Backend**: Electron 30
+- **Cloud Backend**: Supabase (PostgreSQL + Storage)
 - **State Management**: Zustand 4.x
-- **Database**: SQLite (better-sqlite3)
+- **Database**: 
+  - SQLite (better-sqlite3) для Electron
+  - Supabase (PostgreSQL) для веб-версии
 - **Build Tool**: Vite 5.x
 - **Routing**: React Router 6.x (HashRouter)
 - **Testing**: Vitest + React Testing Library
 - **Validation**: Zod (для DTO валидации)
 - **Virtualization**: react-window (для больших списков)
 - **Updates**: electron-updater
+- **Deployment**: Vercel (для веб-версии)
 
 ## Архитектурные слои
 
-Приложение следует многослойной архитектуре:
+Приложение следует многослойной архитектуре с поддержкой двух режимов работы:
 
 ```
 ┌──────────────────────────────────────┐
@@ -34,33 +43,53 @@
 ┌──────────────▼───────────────────────┐
 │      State Layer (Zustand)           │
 │  - Store модули (только состояние)   │
-│  - Вызовы IPC через bridge           │
+│  - Использует data-source абстракцию  │
 └──────────────┬───────────────────────┘
                │
 ┌──────────────▼───────────────────────┐
-│      IPC Layer (Electron IPC)        │
-│  - Типизированные контракты          │
-│  - Валидация каналов                 │
-│  - Единый формат ошибок              │
+│   Data Source Layer (Абстракция)     │
+│  - data-source.ts                    │
+│  - Автоматическое переключение:      │
+│    • Electron → IPC bridge            │
+│    • Browser → API client             │
 └──────────────┬───────────────────────┘
+               │
+        ┌──────┴──────┐
+        │             │
+┌───────▼──────┐ ┌───▼──────────────┐
+│ IPC Layer    │ │ HTTP API Layer    │
+│ (Electron)   │ │ (Browser/Supabase)│
+│              │ │                   │
+│ - Типизир.   │ │ - api-client.ts   │
+│   контракты  │ │ - storage-client  │
+│ - Валидация  │ │ - supabase-client │
+│ - IPC bridge │ │                   │
+└───────┬──────┘ └───────────────────┘
+        │             │
+        └──────┬──────┘
                │
 ┌──────────────▼───────────────────────┐
 │      Domain Layer (Business Logic)   │
 │  - Domain Services (бизнес-логика)   │
-│  - Валидация                         │
+│  - Валидация (Zod DTO)               │
 │  - Бизнес-правила                    │
 └──────────────┬───────────────────────┘
                │
-┌──────────────▼───────────────────────┐
-│   Repository Layer (Data Access)     │
-│  - Репозитории (CRUD операции)       │
-│  - Маппинг БД ↔ Domain               │
-└──────────────┬───────────────────────┘
-               │
-┌──────────────▼───────────────────────┐
-│      Database Layer (SQLite)         │
-│  - better-sqlite3                    │
-│  - Миграции                          │
+        ┌──────┴──────┐
+        │             │
+┌───────▼──────┐ ┌───▼──────────────┐
+│ Repository    │ │ Supabase Tables  │
+│ Layer         │ │ (PostgreSQL)     │
+│ (Electron)    │ │                   │
+│               │ │ - RLS policies    │
+│ - Репозитории │ │ - Storage buckets  │
+│ - Маппинг     │ │                   │
+└───────┬───────┘ └───────────────────┘
+        │             │
+┌───────▼─────────────▼──────────────┐
+│      Database Layer                 │
+│  - SQLite (Electron)                │
+│  - Supabase (Browser)               │
 └──────────────────────────────────────┘
 ```
 
