@@ -141,7 +141,7 @@ function extractFileName(avatarPath) {
 async function migrateCustomerAvatars() {
   console.log('👥 Мигрируем аватары клиентов...');
   
-  const customers = db.prepare('SELECT id, name, avatar FROM customers WHERE avatar IS NOT NULL AND avatar != ""').all();
+  const customers = db.prepare('SELECT id, name, avatar FROM customers WHERE avatar IS NOT NULL AND avatar != ?').all('');
   
   if (customers.length === 0) {
     console.log('   Нет клиентов с аватарами');
@@ -188,7 +188,7 @@ async function migrateCustomerAvatars() {
 async function migrateContractorAvatars() {
   console.log('👷 Мигрируем аватары подрядчиков...');
   
-  const contractors = db.prepare('SELECT id, name, avatar FROM contractors WHERE avatar IS NOT NULL AND avatar != ""').all();
+  const contractors = db.prepare('SELECT id, name, avatar FROM contractors WHERE avatar IS NOT NULL AND avatar != ?').all('');
   
   if (contractors.length === 0) {
     console.log('   Нет подрядчиков с аватарами');
