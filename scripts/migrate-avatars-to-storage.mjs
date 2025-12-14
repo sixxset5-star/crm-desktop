@@ -234,22 +234,27 @@ async function migrateContractorAvatars() {
  */
 async function migrate() {
   try {
-    // Проверяем, что bucket существует
-    const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+    // Проверяем, что bucket существует, пытаясь получить список файлов
+    // (более надежный способ проверки, чем listBuckets)
+    const { data: files, error: testError } = await supabase.storage
+      .from('avatars')
+      .list('', { limit: 1 });
     
-    if (bucketsError) {
-      console.error('❌ Ошибка при проверке buckets:', bucketsError.message);
-      process.exit(1);
+    if (testError) {
+      if (testError.message?.includes('not found') || testError.message?.includes('does not exist')) {
+        console.error('❌ Bucket "avatars" не найден в Supabase Storage!');
+        console.error('   Сначала создайте bucket:');
+        console.error('   1. Откройте Supabase Dashboard → Storage');
+        console.error('   2. Нажмите "New bucket"');
+        console.error('   3. Name: avatars, Public: ✅');
+        console.error('   4. Или выполните SQL из SETUP_STORAGE.md');
+        process.exit(1);
+      }
+      // Другие ошибки (например, нет прав) - пропускаем проверку, попробуем загрузить
+      console.log('⚠️  Не удалось проверить bucket, попробуем загрузить файлы...\n');
+    } else {
+      console.log('✅ Bucket "avatars" доступен\n');
     }
-
-    const avatarsBucket = buckets?.find(b => b.id === 'avatars');
-    if (!avatarsBucket) {
-      console.error('❌ Bucket "avatars" не найден в Supabase Storage!');
-      console.error('   Сначала создайте bucket (см. SETUP_STORAGE.md)');
-      process.exit(1);
-    }
-
-    console.log('✅ Bucket "avatars" найден\n');
 
     await migrateCustomerAvatars();
     await migrateContractorAvatars();
