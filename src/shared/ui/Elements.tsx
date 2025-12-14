@@ -81,7 +81,7 @@ export function Avatar({ src, alt, size = 32, backgroundColor = 'var(--accent)' 
 	
 	React.useEffect(() => {
 		setImageError(false);
-	}, [src]);
+	}, [normalizedSrc]);
 	
 	if (normalizedSrc && !imageError) {
 		return (
