@@ -5,9 +5,9 @@
 import { create } from 'zustand';
 import type { Credit, CreditScheduleItem } from './goals';
 import {
-	loadCredits,
-	saveCredit,
-	deleteCredit,
+	loadCredits as loadCreditsFromSource,
+	saveCredit as saveCreditToSource,
+	deleteCredit as deleteCreditFromSource,
 } from '@/shared/lib/data-source';
 import {
 	rebuildCreditSchedule,
@@ -65,7 +65,7 @@ export const useCreditsStore = create<CreditsState>((set, get) => ({
 		// Если _skipUpdate и стор пустой, делаем ретрай (иначе после reload так и останется пусто)
 		for (let attempt = 1; attempt <= 5; attempt++) {
 			try {
-				const credits = await loadCredits();
+				const credits = await loadCreditsFromSource();
 				// Для совместимости с новой логикой - всегда обновляем
 				const result = { credits, _skipUpdate: false, needsMigration: false, migrationCount: 0 };
 
@@ -131,7 +131,7 @@ export const useCreditsStore = create<CreditsState>((set, get) => ({
 		try {
 			// Для совместимости: если есть schedule, сохраняем его тоже
 			const creditWithSchedule = creditDraft as Credit & { schedule?: CreditScheduleItem[] };
-			await saveCredit(creditWithSchedule);
+			await saveCreditToSource(creditWithSchedule);
 			const savedCredit = creditDraft; // После сохранения используем исходный объект
 			set((state) => {
 				const existingIndex = state.credits.findIndex((c) => c.id === savedCredit.id);
@@ -227,7 +227,7 @@ export const useCreditsStore = create<CreditsState>((set, get) => ({
 	
 	deleteCredit: async (id: string) => {
 		try {
-			await deleteCredit(id);
+			await deleteCreditFromSource(id);
 			set((state) => ({
 				credits: state.credits.filter((c) => c.id !== id),
 			}));
