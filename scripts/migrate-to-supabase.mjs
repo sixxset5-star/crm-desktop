@@ -80,9 +80,10 @@ async function migrateTasks() {
 
   // Преобразуем JSON поля и исключаем колонки, которых нет в схеме Supabase
   const tasksToMigrate = tasks.map(task => {
-    const { contractor_id, ...taskWithoutContractorId } = task; // Удаляем contractor_id
+    // Удаляем колонки, которых нет в схеме Supabase
+    const { contractor_id, paused_from_column_id, ...taskCleaned } = task;
     return {
-      ...taskWithoutContractorId,
+      ...taskCleaned,
       payments: parseJSON(task.payments),
       expenses_entries: parseJSON(task.expenses_entries),
       paused_ranges: parseJSON(task.paused_ranges),
@@ -138,14 +139,16 @@ async function migrateContractors() {
     return;
   }
 
-  // Исключаем колонки, которых нет в схеме Supabase
+  // Исключаем колонки, которых нет в схеме Supabase и преобразуем is_active -> active
   const contractorsToMigrate = contractors.map(contractor => {
-    const { created_at, updated_at, ...contractorWithoutDates } = contractor; // Удаляем created_at и updated_at
+    // Удаляем колонки, которых нет в схеме Supabase
+    const { created_at, updated_at, is_active, specialization, rate, rating, ...contractorCleaned } = contractor;
     return {
-      ...contractorWithoutDates,
+      ...contractorCleaned,
       contacts: parseJSON(contractor.contacts),
       accesses: parseJSON(contractor.accesses),
-      active: contractor.active ?? 1, // По умолчанию активен
+      // Преобразуем is_active (0/1) в active (0/1)
+      active: contractor.is_active ?? contractor.active ?? 1, // По умолчанию активен
     };
   });
 
