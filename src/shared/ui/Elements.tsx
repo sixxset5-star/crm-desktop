@@ -11,6 +11,71 @@ export type AvatarProps = {
 };
 
 export function Avatar({ src, alt, size = 32, backgroundColor = 'var(--accent)' }: AvatarProps): React.ReactElement {
+	// Нормализуем путь аватара (преобразует crm:// в Supabase URL в браузере)
+	const normalizedSrc = React.useMemo(() => {
+		if (!src) return null;
+		
+		// Если это уже полный URL - возвращаем как есть
+		if (src.startsWith('http://') || src.startsWith('https://')) {
+			return src;
+		}
+		
+		// Проверяем, в браузере ли мы
+		const isBrowser = typeof window !== 'undefined' && !(window as any).crm;
+		
+		// В браузере преобразуем crm:// в Supabase Storage URL
+		if (src.startsWith('crm://')) {
+			if (isBrowser) {
+				const fileName = decodeURIComponent(src.replace('crm://', '').replace(/^.*[\\\/]/, ''));
+				try {
+					const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+					if (supabaseUrl) {
+						const projectId = supabaseUrl.replace('https://', '').replace('.supabase.co', '');
+						return `https://${projectId}.supabase.co/storage/v1/object/public/avatars/${encodeURIComponent(fileName)}`;
+					}
+				} catch {
+					// Если не удалось - возвращаем как есть
+				}
+			}
+			return src;
+		}
+		
+		// Если это file://
+		if (src.startsWith('file://')) {
+			const match = src.match(/[^/]+$/);
+			if (match) {
+				const fileName = decodeURIComponent(match[0]);
+				if (isBrowser) {
+					try {
+						const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+						if (supabaseUrl) {
+							const projectId = supabaseUrl.replace('https://', '').replace('.supabase.co', '');
+							return `https://${projectId}.supabase.co/storage/v1/object/public/avatars/${encodeURIComponent(fileName)}`;
+						}
+					} catch {
+						// Если не удалось
+					}
+				}
+				return `crm://${encodeURIComponent(fileName)}`;
+			}
+		}
+		
+		// Если это просто имя файла
+		if (isBrowser) {
+			try {
+				const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+				if (supabaseUrl) {
+					const projectId = supabaseUrl.replace('https://', '').replace('.supabase.co', '');
+					const fileName = src.replace(/^.*[\\\/]/, '');
+					return `https://${projectId}.supabase.co/storage/v1/object/public/avatars/${encodeURIComponent(fileName)}`;
+				}
+			} catch {
+				// Если не удалось
+			}
+		}
+		
+		return src;
+	}, [src]);
 	const dimension = { width: size, height: size };
 	const [imageError, setImageError] = React.useState(false);
 	
@@ -18,10 +83,10 @@ export function Avatar({ src, alt, size = 32, backgroundColor = 'var(--accent)' 
 		setImageError(false);
 	}, [src]);
 	
-	if (src && !imageError) {
+	if (normalizedSrc && !imageError) {
 		return (
 			<img
-				src={src}
+				src={normalizedSrc}
 				alt={alt}
 				onError={() => setImageError(true)}
 				style={{
@@ -86,6 +151,73 @@ export function CustomerChip({ name, avatarUrl, variant = 'default', minHeight }
 		setImageError(false);
 	}, [avatarUrl]);
 	
+	// Нормализуем путь аватара (преобразует crm:// в Supabase URL в браузере)
+	const normalizedAvatarUrl = React.useMemo(() => {
+		if (!avatarUrl) return null;
+		
+		// Если это уже полный URL - возвращаем как есть
+		if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+			return avatarUrl;
+		}
+		
+		// Проверяем, в браузере ли мы
+		const isBrowser = typeof window !== 'undefined' && !(window as any).crm;
+		
+		// В браузере преобразуем crm:// в Supabase Storage URL
+		if (avatarUrl.startsWith('crm://')) {
+			if (isBrowser) {
+				const fileName = decodeURIComponent(avatarUrl.replace('crm://', '').replace(/^.*[\\\/]/, ''));
+				try {
+					const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+					if (supabaseUrl) {
+						const projectId = supabaseUrl.replace('https://', '').replace('.supabase.co', '');
+						return `https://${projectId}.supabase.co/storage/v1/object/public/avatars/${encodeURIComponent(fileName)}`;
+					}
+				} catch {
+					// Если не удалось - возвращаем как есть
+				}
+			}
+			// В Electron - возвращаем как есть
+			return avatarUrl;
+		}
+		
+		// Если это file:// или просто имя файла
+		if (avatarUrl.startsWith('file://')) {
+			const match = avatarUrl.match(/[^/]+$/);
+			if (match) {
+				const fileName = decodeURIComponent(match[0]);
+				if (isBrowser) {
+					try {
+						const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+						if (supabaseUrl) {
+							const projectId = supabaseUrl.replace('https://', '').replace('.supabase.co', '');
+							return `https://${projectId}.supabase.co/storage/v1/object/public/avatars/${encodeURIComponent(fileName)}`;
+						}
+					} catch {
+						// Если не удалось
+					}
+				}
+				return `crm://${encodeURIComponent(fileName)}`;
+			}
+		}
+		
+		// Если это просто имя файла
+		if (isBrowser) {
+			try {
+				const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+				if (supabaseUrl) {
+					const projectId = supabaseUrl.replace('https://', '').replace('.supabase.co', '');
+					const fileName = avatarUrl.replace(/^.*[\\\/]/, '');
+					return `https://${projectId}.supabase.co/storage/v1/object/public/avatars/${encodeURIComponent(fileName)}`;
+				}
+			} catch {
+				// Если не удалось
+			}
+		}
+		
+		return avatarUrl;
+	}, [avatarUrl]);
+	
 	// Вычисляем размер аватарки на основе minHeight
 	// Если minHeight передан, увеличиваем аватарку пропорционально
 	const avatarSize = minHeight 
@@ -101,10 +233,10 @@ export function CustomerChip({ name, avatarUrl, variant = 'default', minHeight }
 				...(minHeight ? { minHeight } : {}),
 			}}
 		>
-			{avatarUrl && !imageError ? (
+			{normalizedAvatarUrl && !imageError ? (
 				<img 
 					className={customerStyles._avatar} 
-					src={avatarUrl} 
+					src={normalizedAvatarUrl} 
 					alt={name}
 					onError={() => setImageError(true)}
 					style={avatarSize ? { width: avatarSize, height: avatarSize } : undefined}
