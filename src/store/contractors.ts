@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { saveContractorsToDisk, loadContractorsFromDisk, deactivateContractorOnDisk, deleteContractorOnDisk } from '@/shared/lib/electron-bridge';
+import { saveContractors, loadContractors } from '@/shared/lib/data-source';
+import { deactivateContractorOnDisk, deleteContractorOnDisk } from '@/shared/lib/electron-bridge';
 import type { Contractor } from '@/types';
 import { createLogger } from '@/shared/lib/logger';
 import { generateShortId } from '@/shared/utils/id';
@@ -38,7 +39,7 @@ export const useContractorsStore = create<ContractorState>((set, get) => ({
 			contractorsCount: updatedContractors.length, 
 			contractor: c 
 		});
-		saveContractorsToDisk(updatedContractors).catch((error) => {
+		saveContractors(updatedContractors).catch((error) => {
 			log.error('Failed to save contractors after add', error);
 		});
 		return c;
@@ -66,7 +67,7 @@ export const useContractorsStore = create<ContractorState>((set, get) => ({
 		});
 		log.debug('Saving contractors to disk', { contractorsCount: updatedContractors.length });
 		// Сохраняем сразу с обновленным массивом
-		saveContractorsToDisk(updatedContractors)
+		saveContractors(updatedContractors)
 			.then(() => {
 				log.debug('Contractors saved successfully after update');
 			})
@@ -123,7 +124,7 @@ export const useContractorsStore = create<ContractorState>((set, get) => ({
 		try {
 			isLoading = true;
 			set({ loading: true });
-			const list = await loadContractorsFromDisk();
+			const list = await loadContractors();
 			
 			log.debug('Loaded contractors from disk', { count: list.length });
 			set({ contractors: list, loading: false }); // Устанавливаем даже если пустой массив
@@ -160,7 +161,7 @@ useContractorsStore.subscribe((state) => {
 	// Увеличиваем задержку, чтобы дать время прямому сохранению через updateContractor/addContractor
 	saveTimer = setTimeout(() => {
 		log.debug('Autosave triggered', { contractorsCount: state.contractors.length });
-		saveContractorsToDisk(state.contractors).catch((error) => {
+		saveContractors(state.contractors).catch((error) => {
 			log.error('Autosave failed', error);
 		});
 	}, 1000); // Увеличена задержка с 300ms до 1000ms

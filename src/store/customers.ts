@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { saveCustomersToDisk, loadCustomersFromDisk } from '@/shared/lib/electron-bridge';
+import { saveCustomers, loadCustomers } from '@/shared/lib/data-source';
 import { createLogger } from '@/shared/lib/logger';
 
 const log = createLogger('Customers');
@@ -23,7 +23,7 @@ export const useCustomersStore = create<CustomerState>((set, get) => ({
 	addCustomer: (name, contact, avatar) => {
 		const c: Customer = { id: generateShortId(), name, contact, avatar };
 		set((s) => ({ customers: [...s.customers, c] }));
-		void saveCustomersToDisk(get().customers);
+		void saveCustomers(get().customers);
 		setTimeout(() => triggerCustomerCreated(c), 0);
 		return c;
 	},
@@ -47,7 +47,7 @@ export const useCustomersStore = create<CustomerState>((set, get) => ({
 	removeCustomer: (id) => {
 		const customer = get().customers.find((c) => c.id === id);
 		set((s) => ({ customers: s.customers.filter((c) => c.id !== id) }));
-		void saveCustomersToDisk(get().customers);
+		void saveCustomers(get().customers);
 		if (customer) {
 			setTimeout(() => triggerCustomerDeleted(customer), 0);
 		}
@@ -60,7 +60,7 @@ export const useCustomersStore = create<CustomerState>((set, get) => ({
 		try {
 			isLoading = true;
 			set({ loading: true });
-			const list = await loadCustomersFromDisk();
+			const list = await loadCustomers();
 			
 			// Миграция и валидация через утилиту
 			const migrated = migrateCustomers(list);
@@ -91,7 +91,7 @@ useCustomersStore.subscribe((state) => {
 	if (!hasLoadedOnce && state.customers.length === 0) return;
 	if (saveTimer) clearTimeout(saveTimer);
 	saveTimer = setTimeout(() => {
-		saveCustomersToDisk(state.customers).catch(() => {});
+		saveCustomers(state.customers).catch(() => {});
 	}, 300);
 });
 

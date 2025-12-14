@@ -5,8 +5,11 @@
 import { create } from 'zustand';
 import type { Credit, CreditScheduleItem } from './goals';
 import {
-	loadCreditsFromDisk,
-	saveCreditToDisk,
+	loadCredits,
+	saveCredit,
+	deleteCredit,
+} from '@/shared/lib/data-source';
+import {
 	rebuildCreditSchedule,
 	applyCreditPayment as applyCreditPaymentBridge,
 	buildCreditSchedule as buildCreditScheduleBridge,
@@ -62,7 +65,9 @@ export const useCreditsStore = create<CreditsState>((set, get) => ({
 		// Если _skipUpdate и стор пустой, делаем ретрай (иначе после reload так и останется пусто)
 		for (let attempt = 1; attempt <= 5; attempt++) {
 			try {
-				const result = await loadCreditsFromDisk();
+				const credits = await loadCredits();
+				// Для совместимости с новой логикой - всегда обновляем
+				const result = { credits, _skipUpdate: false, needsMigration: false, migrationCount: 0 };
 
 				// Если данные успешно загружены - обновляем store и выходим
 				if (!result._skipUpdate) {
@@ -124,7 +129,10 @@ export const useCreditsStore = create<CreditsState>((set, get) => ({
 	
 	saveCredit: async (creditDraft: Credit) => {
 		try {
-			const savedCredit = await saveCreditToDisk(creditDraft);
+			// Для совместимости: если есть schedule, сохраняем его тоже
+			const creditWithSchedule = creditDraft as Credit & { schedule?: CreditScheduleItem[] };
+			await saveCredit(creditWithSchedule);
+			const savedCredit = creditDraft; // После сохранения используем исходный объект
 			set((state) => {
 				const existingIndex = state.credits.findIndex((c) => c.id === savedCredit.id);
 				if (existingIndex >= 0) {
@@ -219,8 +227,7 @@ export const useCreditsStore = create<CreditsState>((set, get) => ({
 	
 	deleteCredit: async (id: string) => {
 		try {
-			const { deleteCreditOnDisk } = await import('@/shared/lib/electron-bridge');
-			await deleteCreditOnDisk(id);
+			await deleteCredit(id);
 			set((state) => ({
 				credits: state.credits.filter((c) => c.id !== id),
 			}));

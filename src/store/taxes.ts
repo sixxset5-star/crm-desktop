@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { loadTaxesFromDisk, saveTaxesToDisk } from '@/shared/lib/electron-bridge';
+import { loadTaxes, saveTaxes } from '@/shared/lib/data-source';
 import { createLogger } from '@/shared/lib/logger';
 
 const log = createLogger('Taxes');
@@ -41,7 +41,7 @@ export const useTaxesStore = create<TaxesState>((set, get) => ({
 	},
 	loadFromDisk: async () => {
 		try {
-			const loaded = await loadTaxesFromDisk();
+			const loaded = await loadTaxes();
 			if (Array.isArray(loaded)) {
 				// Ожидаем массив вида { key, paid }
 				const normalized: TaxPaidFlag[] = loaded
@@ -60,7 +60,7 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null;
 useTaxesStore.subscribe((state) => {
 	if (saveTimer) clearTimeout(saveTimer);
 	saveTimer = setTimeout(() => {
-		saveTaxesToDisk(state.paidFlags).catch(() => {});
+		saveTaxes(state.paidFlags).catch(() => {});
 	}, 300);
 });
 

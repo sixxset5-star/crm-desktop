@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { saveIncomesToDisk, loadIncomesFromDisk } from '@/shared/lib/electron-bridge';
+import { saveIncomes, loadIncomes } from '@/shared/lib/data-source';
 import { createLogger } from '@/shared/lib/logger';
 
 const log = createLogger('Income');
@@ -79,7 +79,7 @@ export const useIncomeStore = create<IncomeState>((set, get) => ({
 		}
 		try {
 			isLoading = true;
-			const data = await loadIncomesFromDisk();
+			const data = await loadIncomes();
 			if (Array.isArray(data)) {
 				const valid = data.filter((i) => i && typeof i === 'object' && i.id && i.title && i.amount != null && i.date);
 				set({ incomes: valid });
@@ -108,7 +108,7 @@ useIncomeStore.subscribe((state) => {
 	if (saveTimer) clearTimeout(saveTimer);
 	saveTimer = setTimeout(() => {
 		// Сохраняем всегда, даже если массив пустой (для корректного удаления)
-		saveIncomesToDisk(state.incomes).catch(() => {});
+		saveIncomes(state.incomes).catch(() => {});
 	}, 300);
 });
 

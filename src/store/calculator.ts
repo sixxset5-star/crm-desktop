@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { loadCalculationsFromDisk, saveCalculationsToDisk } from '@/shared/lib/electron-bridge';
+import { loadCalculations, saveCalculations } from '@/shared/lib/data-source';
 import { createLogger } from '@/shared/lib/logger';
 import { generateShortId } from '@/shared/utils/id';
 
@@ -70,7 +70,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
 	},
 	loadFromDisk: async () => {
 		try {
-			const loaded = await loadCalculationsFromDisk();
+			const loaded = await loadCalculations();
 			if (Array.isArray(loaded)) {
 				set({ calculations: loaded });
 			}
@@ -85,7 +85,7 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null;
 useCalculatorStore.subscribe((state) => {
 	if (saveTimer) clearTimeout(saveTimer);
 	saveTimer = setTimeout(() => {
-		saveCalculationsToDisk(state.calculations).catch(() => {});
+		saveCalculations(state.calculations).catch(() => {});
 	}, 300);
 });
 

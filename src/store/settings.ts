@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { loadSettingsFromDisk, saveSettingsToDisk } from '@/shared/lib/electron-bridge';
+import { loadSettings, saveSettings } from '@/shared/lib/data-source';
 import {
 	mergeSettings,
 	preserveCriticalFields,
@@ -143,7 +143,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 		loadPromise = (async () => {
 			try {
 				set({ isLoading: true });
-				const loaded = await loadSettingsFromDisk();
+				const loaded = await loadSettings();
 				
 				if (loaded && typeof loaded === 'object') {
 					// Merge loaded settings with defaults
@@ -175,7 +175,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 // Zustand subscribe срабатывает только при реальных изменениях состояния,
 // поэтому сравнение через JSON не нужно
 const debouncedSave = debounce((settings: Settings) => {
-	saveSettingsToDisk(settings).catch((err) => {
+	saveSettings(settings).catch((err) => {
 		log.error('Autosave failed', err);
 	});
 }, 300);

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { saveGoalsToDisk, loadGoalsFromDisk } from '@/shared/lib/electron-bridge';
+import { saveGoals, loadGoals } from '@/shared/lib/data-source';
 import { 
 	triggerGoalCreated, 
 	triggerGoalUpdated, 
@@ -98,14 +98,14 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 		addGoal: (title, description, deadline) => {
 		const g: Goal = { id: generateShortId(), title, description, deadline, progress: 0, completed: false };
 		set((s) => ({ goals: [...s.goals, g] }));
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		setTimeout(() => triggerGoalCreated(g), 0);
 	},
 	updateGoal: (id, updates) => {
 		const oldGoal = get().goals.find((g) => g.id === id);
 		set((s) => ({ goals: s.goals.map((g) => (g.id === id ? { ...g, ...updates } : g)) }));
 		const updatedGoal = get().goals.find((g) => g.id === id);
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		
 		if (oldGoal && updatedGoal) {
 			setTimeout(() => triggerGoalUpdated(oldGoal, updatedGoal, updates), 0);
@@ -114,7 +114,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 	removeGoal: (id) => {
 		const goal = get().goals.find((g) => g.id === id);
 		set((s) => ({ goals: s.goals.filter((g) => g.id !== id) }));
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		if (goal) {
 			setTimeout(() => triggerGoalDeleted(goal), 0);
 		}
@@ -137,7 +137,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 				};
 			}
 		});
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		setTimeout(() => triggerMonthlyExpenseCreated(expense, monthKey), 0);
 	},
 	updateMonthlyExpense: (monthKey, expenseId, updates) => {
@@ -152,7 +152,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 		}));
 		const updatedMonthGoal = get().monthlyFinancialGoals.find((m) => m.monthKey === monthKey);
 		const newExpense = updatedMonthGoal?.expenses.find((e) => e.id === expenseId);
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		
 		if (oldExpense && newExpense) {
 			setTimeout(() => triggerMonthlyExpenseUpdated(oldExpense, newExpense, updates, monthKey), 0);
@@ -166,7 +166,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 				m.monthKey === monthKey ? { ...m, expenses: m.expenses.filter((e) => e.id !== expenseId) } : m
 			),
 		}));
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		if (expense) {
 			setTimeout(() => triggerMonthlyExpenseDeleted(expense, monthKey), 0);
 		}
@@ -174,14 +174,14 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 	addCredit: (name, amount, monthlyPayment, interestRate, notes, paymentDate) => {
 		const c: Credit = { id: generateShortId(), name, amount, monthlyPayment, interestRate, notes, paymentDate };
 		set((s) => ({ credits: [...s.credits, c] }));
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		setTimeout(() => triggerCreditCreated(c), 0);
 	},
 	updateCredit: (id, updates) => {
 		const oldCredit = get().credits.find((c) => c.id === id);
 		set((s) => ({ credits: s.credits.map((c) => (c.id === id ? { ...c, ...updates } : c)) }));
 		const newCredit = get().credits.find((c) => c.id === id);
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		if (oldCredit && newCredit) {
 			setTimeout(() => triggerCreditUpdated(oldCredit, newCredit, updates), 0);
 		}
@@ -189,7 +189,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 	removeCredit: (id) => {
 		const credit = get().credits.find((c) => c.id === id);
 		set((s) => ({ credits: s.credits.filter((c) => c.id !== id) }));
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		if (credit) {
 			setTimeout(() => triggerCreditDeleted(credit), 0);
 		}
@@ -210,7 +210,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 				};
 			}
 		});
-		void saveGoalsToDisk({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
+		void saveGoals({ goals: get().goals, monthlyFinancialGoals: get().monthlyFinancialGoals, credits: get().credits });
 		if (updates.manualProfit !== undefined || updates.completed !== undefined) {
 			setTimeout(() => triggerMonthlyFinancialGoalUpdated(monthKey, updates), 0);
 		}
@@ -222,7 +222,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
 		}
 		try {
 			isLoading = true;
-			const data = await loadGoalsFromDisk();
+			const data = await loadGoals();
 			if (data && typeof data === 'object') {
 				// Поддержка старого формата (массив целей) и нового формата (объект с goals и monthlyFinancialGoals)
 				if (Array.isArray(data)) {
@@ -326,7 +326,7 @@ useGoalsStore.subscribe((state) => {
 	if (!hasLoadedOnce && state.goals.length === 0 && state.credits.length === 0) return;
 	if (saveTimer) clearTimeout(saveTimer);
 	saveTimer = setTimeout(() => {
-		saveGoalsToDisk({ goals: state.goals, monthlyFinancialGoals: state.monthlyFinancialGoals, credits: state.credits }).catch(() => {});
+		saveGoals({ goals: state.goals, monthlyFinancialGoals: state.monthlyFinancialGoals, credits: state.credits }).catch(() => {});
 	}, 300);
 });
 

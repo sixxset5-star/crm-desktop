@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { saveExtraWorkToDisk, loadExtraWorkFromDisk } from '@/shared/lib/electron-bridge';
+import { saveExtraWork, loadExtraWork } from '@/shared/lib/data-source';
 import type { ExtraWork, ExtraWorkPayment } from '@/pages/workload/types/extra-work.types';
 import { calculateTotalAmount, normalizeAndValidateWorkDates, generateExtraWorkId } from '@/pages/workload/utils/extraWorkUtils';
 import { useSettingsStore } from '@/store/settings';
@@ -122,7 +122,7 @@ export const useExtraWorkStore = create<ExtraWorkState>((set, get) => ({
 		}
 		try {
 			isLoading = true;
-			const data = await loadExtraWorkFromDisk();
+			const data = await loadExtraWork();
 			if (Array.isArray(data)) {
 				const valid = data.filter(
 					(w) =>
@@ -186,7 +186,7 @@ useExtraWorkStore.subscribe((state) => {
 				hasWeekendRate: 'weekendRate' in work,
 			});
 		});
-		saveExtraWorkToDisk(state.extraWorks).catch(() => {});
+		saveExtraWork(state.extraWorks).catch(() => {});
 	}, 300);
 });
 
