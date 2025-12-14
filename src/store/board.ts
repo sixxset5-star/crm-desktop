@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { loadTasksFromDisk, saveTasksToDisk } from '@/shared/lib/electron-bridge';
+import { loadTasks, saveTasks } from '@/shared/lib/data-source';
 import { useHistoryStore } from './history';
 import { triggerTaskCreated, triggerTaskUpdated, triggerTaskMoved, triggerTaskDeleted } from '@/shared/lib/toast-triggers';
 import { migrateTasks } from '@/shared/lib/task-migration';
@@ -220,7 +220,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 		
 		try {
 			log.debug('Loading tasks from disk');
-			const tasks = await loadTasksFromDisk();
+			const tasks = await loadTasks();
 			log.debug('Loaded tasks', { count: tasks.length });
 			
 			// Проверяем, есть ли задача "Родинка" в загруженных задачах
@@ -363,7 +363,7 @@ useBoardStore.subscribe((state, prevState) => {
 			});
 		}
 		// Сохраняем всегда, даже если массив пустой (для корректного удаления)
-		saveTasksToDisk(currentState.tasks).catch((error) => {
+		saveTasks(currentState.tasks).catch((error) => {
 			log.error('Autosave failed', error);
 		});
 	}, 300);
