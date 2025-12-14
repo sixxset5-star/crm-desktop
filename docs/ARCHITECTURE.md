@@ -109,7 +109,7 @@ crm-desktop/
 │   │   ├── FinancialModel.tsx     # Финансовая модель
 │   │   ├── Calculator.tsx        # Калькулятор
 │   │   ├── Taxes.tsx             # Налоги
-│   │   ├── Goals.tsx             # Финансовые цели
+│   │   ├── Goals.tsx             # Финансовые цели (не используется в роутинге, функциональность в FinancialModel)
 │   │   └── [page-name]/          # Подпапки с компонентами страниц
 │   │       ├── components/       # Компоненты страницы
 │   │       ├── hooks/            # Хуки страницы
@@ -252,13 +252,27 @@ crm-desktop/
 - Zustand stores содержат только состояние
 - Бизнес-логика вынесена в domain-сервисы
 - Автосохранение через подписки
+- Все stores используют `data-source.ts` для работы с данными
 
-**IPC Layer** — коммуникация между процессами
+**Data Source Layer** — абстракция источника данных
+- Единый интерфейс для работы с данными (`data-source.ts`)
+- Автоматическое определение окружения (Electron vs Browser)
+- В Electron использует IPC bridge (`electron-bridge.ts`)
+- В браузере использует API клиент (`api-client.ts`)
+- Прозрачное переключение между режимами
+
+**IPC Layer** (только для Electron) — коммуникация между процессами
 - Типизированные контракты (`ipc-contract-v2.ts`)
 - Валидация каналов в preload и через `ipc-validator.js`
 - Единый формат ответов (`IpcResult<T>`)
 - Реестр контрактов (`ipc-contract-registry.js`)
 - Поддержка событий (updates, banner)
+
+**HTTP API Layer** (только для Browser) — работа с Supabase
+- API клиент (`api-client.ts`) — CRUD операции через Supabase
+- Storage клиент (`storage-client.ts`) — работа с файлами через Supabase Storage
+- Supabase клиент (`supabase-client.ts`) — инициализация клиента
+- Автоматическое преобразование snake_case ↔ camelCase
 
 **Domain Layer** — бизнес-логика
 - Domain-сервисы содержат валидацию и правила
@@ -290,14 +304,34 @@ crm-desktop/
 - **financialSnapshots.ts** — финансовые снимки
 - **history.ts** — история изменений
 
-Все store модули имеют методы `loadFromDisk()` и используют IPC bridge для синхронизации с БД. Инициализация всех stores происходит параллельно в `loadAllStores()`.
+Все store модули имеют методы `loadFromDisk()` и используют `data-source.ts` для синхронизации с БД. В зависимости от окружения:
+- **Electron**: данные загружаются через IPC bridge
+- **Browser**: данные загружаются через Supabase API
+
+Инициализация всех stores происходит параллельно в `loadAllStores()`.
 
 ### 3. Работа с данными
 
-**Хранение**: SQLite база данных
+**Двойная архитектура хранения**:
+
+**Electron режим** (Desktop):
+- SQLite база данных
 - Путь: `~/Library/Application Support/CRM Desktop/crm.db` (macOS)
 - Все операции с БД выполняются в Electron main процессе
 - Renderer процесс общается с БД через IPC каналы
+- Файлы хранятся локально в файловой системе
+
+**Browser режим** (Web):
+- Supabase (PostgreSQL) база данных
+- Все операции через HTTP API (`api-client.ts`)
+- Файлы хранятся в Supabase Storage (`storage-client.ts`)
+- Автоматическая синхронизация данных между устройствами
+
+**Абстракция источника данных** (`data-source.ts`):
+- Автоматически определяет окружение (Electron или Browser)
+- Предоставляет единый интерфейс для всех операций с данными
+- Прозрачное переключение между IPC и HTTP API
+- Все stores используют `data-source.ts`, а не напрямую IPC/API
 
 **IPC каналы** (определены в `src/shared/lib/ipc-contract-v2.ts`):
 - `tasks:*` — операции с задачами (load, save)
@@ -409,13 +443,15 @@ type IpcResult<T> =
 - `/workload` — Workload (Нагрузка)
 - `/customers` — Customers (Клиенты)
 - `/contractors` — Contractors (Подрядчики)
-- `/financial-model` — FinancialModel (Финансовая модель)
+- `/financial-model` — FinancialModel (Финансовая модель, включает кредиты и цели)
 - `/calculator` — Calculator (Калькулятор)
 - `/taxes` — Taxes (Налоги)
 - `/settings` — Settings (Настройки)
 - `/archive` — Archive (Архив)
 
-Все страницы загружаются через lazy loading для оптимизации.
+**Примечание**: Компонент `Goals.tsx` существует, но не используется в роутинге. Функциональность целей интегрирована в страницу FinancialModel.
+
+Все страницы загружаются через lazy loading для оптимизации. Критичные страницы (Dashboard, Customers, Contractors) предзагружаются после инициализации приложения.
 
 ## Основные функции
 
@@ -455,6 +491,8 @@ npm run dist:mac
 
 ## База данных
 
+### Electron (SQLite)
+
 **Схема** (основные таблицы):
 - `tasks` — задачи
 - `customers` — клиенты
@@ -478,6 +516,19 @@ npm run dist:mac
 - Автоматическое применение при запуске
 - Поддержка миграций данных (например, `credits-migration.js`)
 
+### Browser (Supabase/PostgreSQL)
+
+**Схема** идентична SQLite, но адаптирована для PostgreSQL:
+- Те же таблицы с теми же полями
+- Автоматическое преобразование snake_case ↔ camelCase
+- Row Level Security (RLS) политики для безопасности
+- Supabase Storage для файлов (bucket `avatars`)
+
+**Миграция данных**:
+- Скрипт миграции: `scripts/migrate-to-supabase.mjs`
+- Подробная инструкция: `docs/MIGRATION_TO_CLOUD.md`
+- Поддержка миграции всех таблиц и файлов
+
 ## Тестирование
 
 - Тесты: Vitest + React Testing Library
@@ -489,9 +540,16 @@ npm run dist:mac
 
 1. **Пути импорта**: Используются алиасы `@/` для `src/` (настроено в `tsconfig.json` и `vite.config.ts`)
 
-2. **Electron IPC**: Все взаимодействие с БД и системой происходит через IPC каналы, определенные в `src/shared/lib/ipc-contract-v2.ts`. Используйте типизированный API через `window.crm.invoke()`.
+2. **Работа с данными**: Используйте `data-source.ts` для всех операций с данными. Не вызывайте напрямую IPC или API клиенты. `data-source.ts` автоматически выберет правильный способ работы:
+   - В Electron: через IPC bridge (`electron-bridge.ts`)
+   - В браузере: через Supabase API (`api-client.ts`)
 
-3. **State persistence**: Каждый store модуль сам отвечает за сохранение/загрузку данных через IPC. Все stores загружаются параллельно при старте приложения.
+3. **State persistence**: Каждый store модуль сам отвечает за сохранение/загрузку данных через `data-source.ts`. Все stores загружаются параллельно при старте приложения.
+
+4. **Supabase интеграция**: Для веб-версии требуется настройка переменных окружения:
+   - `VITE_SUPABASE_URL` — URL проекта Supabase
+   - `VITE_SUPABASE_ANON_KEY` — публичный ключ Supabase
+   См. документацию в `docs/MIGRATION_TO_CLOUD.md` для деталей.
 
 4. **Стили**: Используются CSS модули и CSS переменные (токены), избегать inline стилей. Токены определены в `src/shared/styles/tokens.css`.
 
@@ -506,10 +564,19 @@ npm run dist:mac
 9. **Архитектура**: При добавлении новой функциональности следовать слоистой архитектуре:
    - Создать DTO для валидации в `electron/domain/dto/`
    - Создать domain-сервис для бизнес-логики в `electron/domain/`
-   - Создать репозиторий для доступа к данным в `electron/repositories/`
-   - Создать IPC обработчик в `electron/ipc/`
-   - Обновить типы в `ipc-contract-v2.ts`
-   - Обновить store модуль в `src/store/` (только состояние)
+   - Создать репозиторий для доступа к данным в `electron/repositories/` (только для Electron)
+   - Создать IPC обработчик в `electron/ipc/` (только для Electron)
+   - Добавить методы в `api-client.ts` для веб-версии (если нужно)
+   - Добавить методы в `data-source.ts` для абстракции
+   - Обновить типы в `ipc-contract-v2.ts` (только для Electron)
+   - Обновить store модуль в `src/store/` (только состояние, использует `data-source.ts`)
    - При необходимости создать domain модель в `src/domain/`
 
-10. **Тестирование**: Компоненты и хуки должны иметь тесты в `__tests__/` папках. Используйте Vitest и React Testing Library.
+10. **Двойная архитектура**: При разработке учитывайте, что приложение работает в двух режимах:
+    - **Electron**: использует IPC и локальную БД
+    - **Browser**: использует HTTP API и Supabase
+    Все операции с данными должны проходить через `data-source.ts` для обеспечения совместимости.
+
+11. **Тестирование**: Компоненты и хуки должны иметь тесты в `__tests__/` папках. Используйте Vitest и React Testing Library.
+
+12. **Веб-версия**: Приложение автоматически деплоится на Vercel при каждом push в main. Убедитесь, что переменные окружения настроены в Vercel Dashboard. См. `docs/DEPLOYMENT.md` для деталей.
