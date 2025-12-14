@@ -14,6 +14,11 @@ if [ "$MIGRATION_TYPE" = "avatars" ]; then
   echo "📁 Текущая директория: $(pwd)"
   echo ""
   node scripts/migrate-avatars-to-storage.mjs
+elif [ "$MIGRATION_TYPE" = "fix-settings" ]; then
+  echo "🔧 Исправление структуры настроек в Supabase..."
+  echo "📁 Текущая директория: $(pwd)"
+  echo ""
+  node scripts/fix-settings-in-supabase.mjs
 else
   echo "🚀 Запуск миграции данных из SQLite в Supabase..."
   echo "📁 Текущая директория: $(pwd)"
