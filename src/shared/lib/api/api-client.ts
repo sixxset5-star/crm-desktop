@@ -98,6 +98,7 @@ export async function saveTasks(tasks: Task[]): Promise<void> {
     }
 
     // Преобразуем camelCase в snake_case для Supabase
+    // Исключаем поля, которых нет в схеме Supabase (paused_from_column_id, contractor_id)
     const dbTasks = tasks.map((task: any) => ({
       id: task.id,
       title: task.title,
@@ -121,7 +122,7 @@ export async function saveTasks(tasks: Task[]): Promise<void> {
       priority: task.priority ?? null,
       accesses: task.accesses ? (typeof task.accesses === 'string' ? task.accesses : JSON.stringify(task.accesses)) : null,
       column_id: task.columnId ?? 'unprocessed',
-      paused_from_column_id: task.pausedFromColumnId ?? null,
+      // paused_from_column_id и contractor_id отсутствуют в схеме Supabase - не отправляем
       created_at: task.createdAt ?? null,
       updated_at: task.updatedAt ?? null,
     }));
