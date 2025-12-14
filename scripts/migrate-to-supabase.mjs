@@ -10,20 +10,25 @@
 
 import Database from 'better-sqlite3';
 import { createClient } from '@supabase/supabase-js';
-import { app } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 // Получаем путь к базе данных
 function getDatabasePath() {
-  // Если запущено в Electron
-  if (typeof app !== 'undefined' && app.isReady) {
-    return path.join(app.getPath('userData'), 'crm.db');
+  // Для macOS (стандартное расположение для Electron приложений)
+  const homeDir = process.env.HOME || process.env.USERPROFILE;
+  const dbPath = path.join(homeDir, 'Library', 'Application Support', 'CRM Desktop', 'crm.db');
+  
+  // Альтернативный путь (если используется другое имя)
+  if (!fs.existsSync(dbPath)) {
+    const altPath = path.join(homeDir, 'Library', 'Application Support', 'MansurovCRM', 'crm.db');
+    if (fs.existsSync(altPath)) {
+      return altPath;
+    }
   }
   
-  // Для macOS
-  const homeDir = process.env.HOME || process.env.USERPROFILE;
-  return path.join(homeDir, 'Library', 'Application Support', 'CRM Desktop', 'crm.db');
+  return dbPath;
 }
 
 // Получаем ключи Supabase из переменных окружения
