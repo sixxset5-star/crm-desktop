@@ -274,25 +274,44 @@ async function migrateIncomes() {
 // Миграция настроек
 async function migrateSettings() {
   console.log('⚙️  Мигрируем настройки...');
-  const settings = db.prepare('SELECT * FROM settings').all();
+  // В SQLite настройки хранятся как одна запись с key='main'
+  const row = db.prepare('SELECT * FROM settings WHERE key = ?').get('main');
   
-  if (settings.length === 0) {
+  if (!row) {
     console.log('   Нет настроек для миграции');
     return;
   }
 
-  // Преобразуем в формат для Supabase (значения уже JSON строки)
-  const settingsToMigrate = settings.map(s => ({
-    key: s.key,
-    value: parseJSON(s.value), // Парсим JSON чтобы сохранить как JSONB
-  }));
+  // Парсим JSON значение (весь объект Settings)
+  const settingsValue = parseJSON(row.value);
+  
+  if (!settingsValue) {
+    console.log('   Настройки пустые или невалидные');
+    return;
+  }
 
-  const { error } = await supabase.from('settings').upsert(settingsToMigrate, { onConflict: 'key' });
+  // Сохраняем как одну запись с key='main' и значением - весь объект Settings
+  const { error } = await supabase
+    .from('settings')
+    .upsert({
+      key: 'main',
+      value: settingsValue, // JSONB автоматически сериализует
+    }, { onConflict: 'key' });
   
   if (error) {
     console.error('   ❌ Ошибка:', error.message);
   } else {
-    console.log(`   ✅ Мигрировано ${settings.length} настроек`);
+    console.log('   ✅ Настройки мигрированы');
+    // Проверяем наличие критичных полей
+    if (settingsValue.holidays && settingsValue.holidays.length > 0) {
+      console.log(`      Праздников: ${settingsValue.holidays.length}`);
+    }
+    if (settingsValue.customWeekends && settingsValue.customWeekends.length > 0) {
+      console.log(`      Кастомных выходных: ${settingsValue.customWeekends.length}`);
+    }
+    if (settingsValue.excludedWeekends && settingsValue.excludedWeekends.length > 0) {
+      console.log(`      Исключенных выходных: ${settingsValue.excludedWeekends.length}`);
+    }
   }
 }
 
